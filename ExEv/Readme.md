@@ -1,0 +1,1 @@
+Die Formelsammlung ist eine Zusammenführung der verbesserten Formelsammlungen, die wir vom Dozenten erhalten haben. Weiter wurden alle Titel ersetzt, damit man ein Inhaltsverzeichnis mit Seitenzahlen hat um die Themen während der Prüfung schnell zu finden. Die Authoren der Originalversion sind unbekannt.
