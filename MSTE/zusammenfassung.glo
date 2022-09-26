@@ -1,0 +1,14 @@
+\glossaryentry{CLR : Common Language Runtime?\glossentry{gls-clr}|setentrycounter[]{page}"\glsnumberformat}{2}
+\glossaryentry{CIL : Common Intermediate Language?\glossentry{gls-cil}|setentrycounter[]{page}"\glsnumberformat}{2}
+\glossaryentry{MSIL : Microsoft Intermediate Language?\glossentry{gls-msil}|setentrycounter[]{page}"\glsnumberformat}{2}
+\glossaryentry{CTS : Common Type System?\glossentry{gls-cts}|setentrycounter[]{page}"\glsnumberformat}{2}
+\glossaryentry{FCL : Framework Class Library?\glossentry{gls-fcl}|setentrycounter[]{page}"\glsnumberformat}{2}
+\glossaryentry{CLS : Common Language Specification?\glossentry{gls-cls}|setentrycounter[]{page}"\glsnumberformat}{2}
+\glossaryentry{CSC : CSharp Compiler?\glossentry{gls-csc}|setentrycounter[]{page}"\glsnumberformat}{2}
+\glossaryentry{JIT : Just In Time Compiler?\glossentry{gls-jit}|setentrycounter[]{page}"\glsnumberformat}{2}
+\glossaryentry{CLR : Common Language Runtime?\glossentry{gls-clr}|setentrycounter[]{page}"\glsnumberformat}{11}
+\glossaryentry{CTS : Common Type System?\glossentry{gls-cts}|setentrycounter[]{page}"\glsnumberformat}{11}
+\glossaryentry{CLS : Common Language Specification?\glossentry{gls-cls}|setentrycounter[]{page}"\glsnumberformat}{11}
+\glossaryentry{MSIL : Microsoft Intermediate Language?\glossentry{gls-msil}|setentrycounter[]{page}"\glsnumberformat}{12}
+\glossaryentry{JIT : Just In Time Compiler?\glossentry{gls-jit}|setentrycounter[]{page}"\glsnumberformat}{12}
+\glossaryentry{CSC : CSharp Compiler?\glossentry{gls-csc}|setentrycounter[]{page}"\glsnumberformat}{14}

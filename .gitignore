@@ -1,0 +1,13 @@
+*.aux
+*.fdb_latexmk
+*.fls
+*.gz
+*.idx
+*.ilg
+*.ind
+*.log
+*.out
+*.synctex.gz
+*.synctex(busy)
+*.toc
+*.xdv
