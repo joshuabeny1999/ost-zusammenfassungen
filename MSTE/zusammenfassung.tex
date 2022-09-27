@@ -1,3 +1,4 @@
+% !TeX program = xelatex
 % /*
 %  * ----------------------------------------------------------------------------
 %  * "THE BEER-WARE LICENSE" (Revision 42):
@@ -8,7 +9,6 @@
 %  */
 
 % ------- template start -------
-
 \documentclass[
 a4paper,
 oneside,
@@ -27,13 +27,13 @@ bibliography=totocnumbered]{scrartcl}
 \usepackage{float}
 
 % Custom commands
-\newcommand{\AUTHOR}{S.Moll, S.Dellsperger, J.Klaiber, M.Wieland, J.Hürzeler}
+\newcommand{\AUTHOR}{J.Hürzeler, S.Moll, S.Dellsperger, J.Klaiber, M.Wieland}
 \newcommand{\INSTITUTE}{Fachhochschule OST}
 \newcommand{\GITHUB}{https://github.com/joshuabeny1999/ost-zusammenfassungen}
 \newcommand{\LICENSEURL}{https://en.wikipedia.org/wiki/Beerware}
 \newcommand{\LICENSE}{
 "THE BEER-WARE LICENSE" (Revision 42):
-Sharon, Severin, Julian and Michael wrote this file. As long as you retain this notice you
+Joshua, Sharon, Severin, Julian and Michael wrote this file. As long as you retain this notice you
 can do whatever you want with this stuff. If we meet some day, and you think
 this stuff is worth it, you can buy us a beer in return.
 }
@@ -62,7 +62,7 @@ this stuff is worth it, you can buy us a beer in return.
 
 % Glossar und Abkürzungsverzeichnis
 \usepackage[acronym,toc,nopostdot]{glossaries}
-\glossarystyle{altlist}
+\setglossarystyle{altlist}
 \usepackage{xparse}
 \DeclareDocumentCommand{\newdualentry}{ O{} O{} m m m m } {
 	\newglossaryentry{gls-#3}{
@@ -204,7 +204,7 @@ this stuff is worth it, you can buy us a beer in return.
 
 % Dokumentinformationen
 \newcommand{\SUBJECT}{Zusammenfassung}
-\newcommand{\TITLE}{Microsoft Technologien}
+\newcommand{\TITLE}{Microsoft Technologien (.NET)}
 
 \loadglsentries{glossar}
 
@@ -259,7 +259,7 @@ this stuff is worth it, you can buy us a beer in return.
 	\item Unboxing ist die automatische Umwandlung von einem Referent in einen Value Type (explizit).
 \end{itemize}
 
-\begin{minipage}[t]{0.8\textwidth}
+\begin{minipage}[t]{0.9\textwidth}
 	\centering
 	\includegraphics[width=0.8\linewidth]{images/reference_value_type}
 \end{minipage}
@@ -573,10 +573,10 @@ proxy.GetDerivedB();
 </configuration>
 \end{lstlisting}
 
-\section{.NET Framework}
+\section{.NET}
 \begin{itemize}
 	\item Es werden aktuell über 30 Sprachen unterstützt
-	\item Der Source Code wird in die Intermediate Language  (IL: Ähnlich wie Assembler, vergleichbar mit Java Bytecode) kompiliert
+	\item Der Source Code wird in die Microsoft Intermediate Language  (MSIL: Ähnlich wie Assembler, vergleichbar mit Java Bytecode) kompiliert
 	\item Alle Sprachen nutzen das selbe Objektmodell und Bibliotheken
 	      \begin{itemize}
 		      \item gemeinsamer IL-Zwischencode
@@ -595,8 +595,8 @@ proxy.GetDerivedB();
 \end{figure}
 
 \subsection{CLR: Common Language Runtime}
-Die \gls{clr} umfasst mehrere Funtionen wie z.B Just In Time Compilation für die Übersetzung von Intermediate Language Code in Maschinencode. Man versteht unter dem \gls{clr} ein sprachunabhängiges, abstrahiertes Betriebssystem. Es ist verantwortlich für das Memory Management, Class Loading, Garbage Collection, Exceptions, Type Checking, Code Verification des IL-Codes, Threadding
-, Debugging und Threading. Die CLR ist mit der Java VM vergleichbar.
+Die \gls{clr} umfasst mehrere Funtionen wie z.B Just In Time Compilation für die Übersetzung von Intermediate Language Code in Maschinencode.Man versteht unter dem \gls{clr} ein sprachunabhängiges, abstrahiertes Betriebssystem. Es ist verantwortlich für das Memory Management, Class Loading, Garbage Collection, Exceptions, Type Checking, Code Verification des IL-Codes, Threadding
+, Debugging und COM-Interopilität. Die CLR ist mit der Java VM vergleichbar.
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.6\linewidth]{images/common_language_runtime_architektur}
@@ -605,9 +605,9 @@ Die \gls{clr} umfasst mehrere Funtionen wie z.B Just In Time Compilation für di
 \end{figure}
 
 \subsection{CTS: Common Type System}
-Das \gls{cts} ist ein einheitliches Typensystem für alle .NET Programmiersprachen. \gls{cts} ist integriert in \gls{clr}.
+Das \gls{cts} ist ein einheitliches Typensystem für alle .NET Programmiersprachen. \gls{cts} ist integriert in \gls{clr}.Mittels Reflection ist ein programmatisches abfragen des Typensystems möglich. (Erwieterbar mittels "Custom Attributes")
 
-\subsection{CLS: Commong Language Specification}
+\subsection{CLS: Common Language Specification}
 Die \gls{cls} sind allgemeine Regeln für die sprachübergreifende Entwicklung im .NET Framework. CLS kompatible Bibliotheken können in allen .NET Sprachen verwendet werden.
 
 \subsection{MSIL: Microsoft Intermediate Language}
@@ -628,18 +628,23 @@ Die \gls{cls} sind allgemeine Regeln für die sprachübergreifende Entwicklung i
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.5\linewidth]{images/msil_compilation}
+	\includegraphics[width=0.7\linewidth]{images/msil_compilation}
 	\caption{MSIL Kompilierung}
 	\label{fig:msilcompilation}
 \end{figure}
 
 \subsection{JIT: Just in Time Compilation}
-Bei der JIT Kompilierung wird die aufgerufene Methode vor dem Methodenaufruf kompiliert und der IL-Code durch nativen Code ersetzt.
+Bei der JIT Kompilierung wird die aufgerufene Methode vor dem Methodenaufruf kompiliert und der IL-Code durch nativen Code ersetzt. Es gibt drei Typen von JIT-Compilern:
+\begin{itemize}
+	\item Pre-JIT: Gesamter Code vor Ausführung (z.B mit NGEN)
+	\item Normal-JIT (Siehe Diagramm)
+	\item Econo-JIT: Wie Normal-JIT, aber mit Cleanup.
+\end{itemize}
 
 \subsection{Assembly / Komponenten}
-\begin{figure}[h!]
+\begin{figure}[!ht]
 	\centering
-	\includegraphics[width=0.7\linewidth]{images/assembly}
+	\includegraphics[width=0.9\linewidth]{images/assembly}
 	\caption{Assembly Übersicht}
 	\label{fig:assembly}
 \end{figure}
@@ -651,13 +656,43 @@ Ein Assembly kann mit einem JAR File verglichen werden. Ein Assembly enthält MS
 \end{description}
 
 \subsubsection{Module}
-Die Kompilation erzeugt ein Modul mit Code / \gls{msil} und Metadaten. Die Metadaten beschreiben alle Aspekte des Codes ausser der Programmlogik. (Klassen, Methoden und Feld Definitonen) Diese Metadaten können mit Reflektion abgefragt werden.
+Die Kompilation erzeugt ein Modul mit Code / \gls{msil} und Metadaten. Die Metadaten beschreiben alle Aspekte des Codes ausser der Programmlogik. (Klassen, Methoden und Feld Definitonen) Diese Metadaten können mit Reflektion abgefragt werden. Die Metadaten werden von Analysetools (IL Dissassemlber), IDEs (IntelliSense, Object-Browser) als auch von der CLR (Typsicherheitverifikation, Memory Management, JIT Compilation) verwendet.
 
 \subsubsection{References}
 Referenzen zeigen auf eine externe Library. \\
-Referenzen werden beim CSC mittels \lstinline|csc /target:exe /r:MyDLL.dll Program.cs| eingefügt.
+Referenzen werden beim CSC mittels \lstinline|csc /target:exe /r:MyDLL.dll Program.cs| eingefügt. Es gibt verschiedene Arten:
+\begin{itemize}
+	\item Vorkompiliertes Assembly
+	      \begin{itemize}
+		      \item Im File System
+		      \item Debugging nicht verfügbar
+		      \item Navigation nur auf Metadaten-Ebenen
+	      \end{itemize}
+	\item NuGet package
+	      \begin{itemize}
+		      \item Externe Dependency (nuget.org)
+		      \item Debugging nicht verfügbar
+		      \item Navigation nur auf Metadaten-Ebenen
+	      \end{itemize}
+	\item Visual Studio Projekt
+	      \begin{itemize}
+		      \item In gleicher Solution vorhanden
+		      \item Debugging und Navigation verfügbar
+	      \end{itemize}
+	\item .NET Core oder .NET Standard SDK
+	      \begin{itemize}
+		      \item Zwingend
+		      \item Normalerweise: «Microsoft.NETCore.App»
+		      \item Bei .NET Standard «NETStandard.Library»
+	      \end{itemize}
+\end{itemize}
 
+\subsubsection{Packages}
+.NET wird in kleineren Packages ausgeliefert und ist somit kein Monolitisches Framework mehr. Es wird aufgeteilt in diverse NuGet Packages. Dies erlaubt unterschiedliche Releasezyklen, erhöhung der Kompabilität und kleinere Deployment-Einheiten. Zu den wichtigen Packages gehören System.Runtime, System.Collections, System.Net.Http, System.IO.FileSystem, System.Linq und System.Reflection.
+\paragraph{NuGet}\mbox{} \\
+Die \lstinline|*.nupkg| Datei enthält alle Libaries in mehreren Versionen sowie die Manifest/Metadaten (Package Identifier, Titel, Beschreibung, Versions-Informationen, Dependencies, etc.). Es ist als Zip-Datei gespeichert.
 
+Jeder kann Packages in der NuGet Gallery (www.nuget.org) veröffentlichen.
 \clearpage
 
 \subsection{Kompilierung}
@@ -794,8 +829,51 @@ class MyClass {
 }
 \end{lstlisting}
 
+\section{.NET Standard}
+Der .NET Standard bietet die Brücke zwischen den ehemaligen Versionen .NET Framework (Windows) und .NET Core (Universal). Wobei es inzwichen nur noch .NET gibt. Es bietet die gemeinsamen Schnittstellen an, die bei beiden Versionen verwendet werden können. Es werden die minimal zu unterstützten APIs (Klassen und Methoden) pro Version definiert. Als Entwickler kann man sein package kompatibel zu einer bestimmten Standard Version machen. Diese Libaries sind dann Cross-Plattform. Man hält die Fragmentierung der Framework minimal und reduziert Pre-Compiler-Anweisungen.
 
-\section{Visual Studio 15}
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=1\linewidth]{images/standard-vergleich}
+	\caption{Vergleich ohne und mit .NET Standard}
+	\label{fig:standardvergleich}
+\end{figure}
+
+Je höher die Version desto mehr .NET Apis, desto tiefer, einfacher einzubinden. Jede .NET Implementation unterstützt eine andere maximale .NET Standard version. So wird beispielsweise .NET Standard 2.1 von .NET Framework nicht mehr supported, sondern nur noch von .NET Core 3.0 und .NET.
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.9\linewidth]{images/standard-versionen}
+	\caption{Übersicht der .NET-Implementation und deren kompatiblen .NET Standard Versionen}
+	\label{fig:standardversionen}
+\end{figure}
+\section{Command Line Interface CLI}
+Die CLI ist Teil des .NET Core SDK. Es ist die Basis für die high-level Tools (Visual Studio, Rider, etc.) Aufgerufen wird es mit \lstinline|dotnet[.exe] <Verb> <argument> --<option> <param>|.
+\subsection{Kommandos}
+\begin{description}
+	\item[new] Initialize .NET projects.
+	\item[restore] Restore dependencies specified in the .NET project.
+	\item[run] Compiles and immediately executes a .NET project.
+	\item[build] Builds a .NET project.
+	\item[publish] Publishes a .NET project for deployment (including the runtime).
+	\item[test] Runs unit tests using the test runner specified in the project.
+	\item[pack] Creates a NuGet package.
+	\item[migrate] Migrates a project.json based project to a msbuild based project.
+	\item[clean] Clean build output(s).
+	\item[sln] Modify solution (SLN) files.
+	\item[add] Add reference to the project.
+	\item[remove] Remove reference from the project.
+	\item[list] List references of a .NET project.
+	\item[nuget] Provides additional NuGet commands.
+	\item[msbuild] Runs Microsoft Build Engine (MSBuild).
+	\item[vstest] Runs Microsoft Test Execution Command Line Tool.
+	\item[store] Stores the specified assemblies in the runtime store.
+	\item[tool] Install or work with tools that extend the .NET experience.
+	\item[build-server] Interact with servers started by a build.
+	\item[help] Show help.
+\end{description}
+
+
+\section{Visual Studio 22}
 \subsection{Solution}
 Eine Solution besteht aus mehreren Projekten.
 
@@ -826,6 +904,8 @@ Jeder Projektordner enthält folgende zwei Verzeichnisse
 		Beihaltet Files welche während der Kompilierung erzeugt werden und für die Erstellung eines Assemblies nötig sind.
 \end{description}
 
+\subsection{Projekt-Dateien}
+Die Projekte werden als XML-Datei verwaltet in einer \lstinline|*.csproj| Datei. Es beschreibt was alles Kompiliert werden muss, etc. Die Projektdateien werden von Build Engines intepretiert. Es gibt diverse Gruppen. Da gibt es Property-Groups (Settings), Item-Groups (Zu kompiliertende Items), Target-Groups (Weitere Buildsteps)
 
 \section{C\# Grundlagen}
 \subsection{Unterschiede zu Java}
@@ -904,7 +984,7 @@ Jeder Projektordner enthält folgende zwei Verzeichnisse
 \newpage
 
 \subsection{Operatoren}
-\begin{figure}[h!]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=\linewidth]{images/operator_prezedenz}
 	\caption{Operatoren Präzedenz}
@@ -959,7 +1039,7 @@ foreach(int x in y);
 
 \subsection{Datentypen}
 Numerische Datentypen können einen der folgenden Literale haben
-\begin{figure}[h!]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=0.8\linewidth]{images/primitive_types}
 	\caption{Primitive Typen}
@@ -971,14 +1051,14 @@ Numerische Datentypen können einen der folgenden Literale haben
 	\item l/L: long
 	\item f/F: float
 \end{itemize}
-\begin{figure}[h!]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=0.8\linewidth]{images/datatypes}
 	\caption{Datentypen}
 	\label{fig:datatypes}
 \end{figure}
 
-\begin{figure}[h!]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=\linewidth]{images/default_values}
 	\caption{Default Values}
@@ -988,7 +1068,7 @@ Numerische Datentypen können einen der folgenden Literale haben
 \newpage
 
 \subsubsection{Casts}
-\begin{figure}[h!]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=\linewidth]{images/casts}
 	\caption{Casts}
@@ -1016,13 +1096,13 @@ Numerische Datentypen können einen der folgenden Literale haben
 	\begin{minipage}[t]{0.4\textwidth}
 		\centering
 		\includegraphics[width=0.8\linewidth]{images/reference_types}
-		\caption{Referenztypen}
+		\captionof{figure}(Referenztypen)
 		\label{fig:searchtreeinsert1}
 	\end{minipage}
 	\begin{minipage}[t]{0.4\textwidth}
 		\centering
 		\includegraphics[width=0.8\linewidth]{images/value_types}
-		\caption{Wertetypen}
+		\captionof{figure}(Wertetypen)
 		\label{fig:searchtreeinsert2}
 	\end{minipage}
 \end{figure}
@@ -1097,7 +1177,7 @@ o = 123;
 i = (int) o;
 \end{lstlisting}
 
-\begin{figure}[h!]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=0.4\linewidth]{images/boxing}
 	\caption{Boxing}
@@ -1613,28 +1693,25 @@ public class MyClass {
 	\item Konstruktoren (Oberklasse zuerst)
 \end{enumerate}
 
-%\begin{minipage}[t]{1\textwidth}
-%    \centering
-%	\includegraphics[width=0.8\linewidth]{images/lab_10_physical_topology.png}
-%\end{minipage}
+
 
 \begin{minipage}[t]{1\textwidth}
 	\centering
 	\includegraphics[width=0.9\linewidth]{images/init_order}
-	\caption{Initialisierungs-Reihenfolge (mit Vererbung)}
+	\captionof{figure}(Initialisierungs-Reihenfolge (mit Vererbung))
 \end{minipage}
 
 \begin{minipage}[t]{1\textwidth}
 	\centering
 	\includegraphics[width=0.9\linewidth]{images/initialisierungsreihenfolge}
-	\caption{Initialisierungsreihenfolge}
+	\captionof{figure}(Initialisierungsreihenfolge)
 
 \end{minipage}
 
 \begin{minipage}[t]{1\textwidth}
 	\centering
 	\includegraphics[width=\linewidth]{images/init_constructors}
-	\caption{Konstruktoraufrufe}
+	\captionof{figure}(Konstruktoraufrufe)
 \end{minipage}
 
 \subsection{Destruktoren}
@@ -1664,7 +1741,7 @@ MyClass mc3 = mc1 + mc2;
 \end{lstlisting}
 
 Folgende Operatoren können überladen werden
-\begin{figure}[h!]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=0.7\linewidth]{images/operator_overloading}
 	\caption{Operatoren Überladen}
@@ -1891,11 +1968,11 @@ Delegates werden so verwendet:
 	\item Deklaration der Delegate-Variable: \lstinline|Notifier greetings;|
 	\item Zuweisung einer Methode:
 	      \begin{itemize}
-		      \item Standard: \lstinline|greetings = new Notifier(SayHi)|;
+		      \item Standard: \lstinline|greetings = new Notifier(SayHi);|
 		      \item Kurzform: \lstinline|greetings = SayHi; |
 		      \item Anonym: \lstinline| greetings = delegate(string sender) { /* ... *\ } |
 	      \end{itemize}
-	\item Aufruf: \lstinline| greetings("John");
+	\item Aufruf: \lstinline| greetings("John");|
 \end{itemize}
 \begin{lstlisting}
 // Deklaration eines Delegate-Typs 
@@ -1921,6 +1998,7 @@ public delegate void Notifier(string sender);
 \begin{figure}[ht]
 	\centering
 	\includegraphics[width=0.9\linewidth]{images/delegate_lamda_overview}
+	\caption{Delegate Lamda Overview}
 \end{figure}
 
 \subsection{Multicast Delegates}
@@ -2232,7 +2310,7 @@ oper(2) // 6
 Es sind mehrere Iteratoren zur gleichen Zeit auf eine Liste erlaubt. Die Collection darf während der Iteration nicht verändert werden.
 
 \subsection{Foreach Loop}
-Der Foreach Loop ist in C\# gleich wie in Java mit dem Unterschied, dass anstatt einem Dopplepunkt das Keyword \lstinline|in| verwendet wird. In C# hat en \lstinline|foreach|-Loop folgende Besonderheiten:
+Der Foreach Loop ist in C\# gleich wie in Java mit dem Unterschied, dass anstatt einem Dopplepunkt das Keyword \lstinline|in| verwendet wird. In C\# hat en \lstinline|foreach|-Loop folgende Besonderheiten:
 \begin{itemize}
 	\item \lstinline|continue| Unterbricht die aktuelle Iteration
 	\item \lstinline|break| Unterbricht gesamten Loop
@@ -2367,7 +2445,7 @@ foreach (int elem in list.Reverse) { .. }
 	\item Kein Zugriff auf interne Members aus Extension Methode
 \end{itemize}
 
-\begin{lstlisting}[language=sharpc]
+\begin{lstlisting}[language={[Sharp]C}]
  public static class ExentsionMethods
     {
         public static string ToStringSafe(this object current)
@@ -2926,12 +3004,12 @@ Task task = Task
 \subsection{Task vs Thread}
 \begin{minipage}[t]{1\textwidth}
 	\centering
-	\includegraphics[width=1\linewidth]{MsTe/images/task_vs_thread.png}
+	\includegraphics[width=1\linewidth]{images/task_vs_thread.png}
 \end{minipage}
 \subsection{Task API (synchrone waits)}
 \begin{minipage}[t]{1\textwidth}
 	\centering
-	\includegraphics[width=1\linewidth]{MsTe/images/task-api.png}
+	\includegraphics[width=1\linewidth]{images/task-api.png}
 \end{minipage}
 
 \section{ASYNC / AWAIT}
@@ -2970,7 +3048,7 @@ Task task = Task
 
 \begin{minipage}[t]{0.95\textwidth}
 	\centering
-	\includegraphics[width=0.95\linewidth]{MsTe/images/beispiel-async-await.png}
+	\includegraphics[width=0.95\linewidth]{images/beispiel-async-await.png}
 \end{minipage}
 
 \paragraph{Vor- und Nachteile async/await}
@@ -3005,7 +3083,7 @@ Ein OR-Mapper (Mapping) stellt die Verbindung zwischen Datenbank (Storage Entity
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.8\linewidth]{MsTe/images/entityframework_or_mapping.png}
+	\includegraphics[width=0.8\linewidth]{images/entityframework_or_mapping.png}
 	\caption{OR Mapping Entität <-> Tabelle}
 	\label{fig:entityframeworkormapping}
 \end{figure}
@@ -3582,7 +3660,7 @@ modelBuilder.Entity<Product>()
     .HasValue<MobilePhone>(1)
     .HasValue<Tablet>(2);
 \end{lstlisting}
-\begin{figure}[h!]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=0.8\linewidth]{images/table_per_hierarchy.png}
 	\caption{Table per Hierarchy}
@@ -4584,11 +4662,11 @@ using(var context = new AngProjContext()) {
 % \textbf{SaveChanges()} setzt State zurück auf \textbf{Unchanged}.
 % \begin{figure}[ht]
 % \centering
-% \includegraphics[width=0.6\linewidth]{MsTe/images/entity-framework_change-tracker.png}
+% \includegraphics[width=0.6\linewidth]{images/entity-framework_change-tracker.png}
 % \end{figure}
 % \begin{figure}[ht]
 % \centering
-% \includegraphics[width=0.9\linewidth]{MsTe/images/entity-framework_change-tracker-example.png}
+% \includegraphics[width=0.9\linewidth]{images/entity-framework_change-tracker-example.png}
 % \end{figure}
 
 
@@ -4641,7 +4719,7 @@ using(var context = new AngProjContext()) {
 % \subsection{MEX: Meta Data Exchange Endpoint}
 % Ein Service kann ein MEX Endpoint zur Verfügung stellen, der die Spezifikation der Schnittstelle zurückliefert. (\textbf{WSDL}: Web Service Description Language). Visual Studio kann dann gemäss dem WSDL den Client Code generieren. Wenn der Service ändertn, muss natürlich auch der Client Code erneut generiert werden.
 
-% \begin{figure}[h!]
+% \begin{figure}[!ht]
 % \centering
 % \includegraphics[width=0.7\linewidth]{images/mex}
 % \caption{Metadata Exchange Point}
@@ -5046,23 +5124,23 @@ using(var context = new AngProjContext()) {
 % %     \item Kommunikation über HTTP/2
 % % \end{itemize}
 
-% % \begin{figure}[h!]
+% % \begin{figure}[!ht]
 % % \centering
-% % \includegraphics[width=0.8\linewidth]{MsTe/images/grpc-architecture}
+% % \includegraphics[width=0.8\linewidth]{images/grpc-architecture}
 % % \caption{gRPC Architektur}
 % % \label{fig:mex}
 % % \end{figure}
 
-% % \begin{figure}[h!]
+% % \begin{figure}[!ht]
 % % \centering
-% % \includegraphics[width=0.8\linewidth]{MsTe/images/grpc-architecture-layers}
+% % \includegraphics[width=0.8\linewidth]{images/grpc-architecture-layers}
 % % \caption{gRPC Architekturschichten}
 % % \label{fig:mex}
 % % \end{figure}
 
-% % \begin{figure}[h!]
+% % \begin{figure}[!ht]
 % % \centering
-% % \includegraphics[width=0.8\linewidth]{MsTe/images/grpc-architecture-communication}
+% % \includegraphics[width=0.8\linewidth]{images/grpc-architecture-communication}
 % % \caption{gRPC Kommunikation}
 % % \label{fig:mex}
 % % \end{figure}
@@ -5804,11 +5882,12 @@ using(var context = new AngProjContext()) {
 % % }
 % % \end{lstlisting}
 \section{GRPC: Google Remote Procedure Call}
-Neue Standard-Technologie für Backend-Kommunikation in .NET Core. Hohe Performance von zentraler Bedeutung. gRPC ist ein Software Development Kit (SDK), Request-Response-orientiert, Plattform- und Sprach-neutral. Kommunikation über HTTP/2 (Multiplexing (mehrere gRPC Calls pro TCP/IP Connection), Bidirectionales Streaming, Parallele Requests und Responses in einer einzigen TCP Verbindung, Kommunikation wegen HTTPS verschlüsselt).
+Neue Standard-Technologie für Backend-Kommunikation in .NET Core. Hohe Performance von zentraler Bedeutung. gRPC ist ein Software Development Kit (SDK), Request-Response-orientiert, Plattform- und Sprach-neutral.
+Kommunikation über HTTP/2 (Multiplexing (mehrere gRPC Calls pro TCP/IP Connection), Bidirectionales Streaming, Parallele Requests und Responses in einer einzigen TCP Verbindung, Kommunikation wegen HTTPS verschlüsselt).
 
 \textbf{RPC} ermöglicht Client / Server Kommunikation und wird in fast allen verteilten Systemen verwendet.
 \textbf{Grundprinzipien:} Einfache Service-Definition, Sprach-Unabhängigkeit, Problemlose Skalierbarkeit, Bi-direktionales Streaming, integrierte Authentisierungsmechanismen
-\begin{figure}[h!]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=0.6\linewidth]{images/grpc_architektur.png}
 	\caption{gRPC Architektur}
@@ -5824,7 +5903,7 @@ Neue Standard-Technologie für Backend-Kommunikation in .NET Core. Hohe Performa
 	\item[Service-Versionierung]
 \end{description}
 
-\paragraph{Protocol Buffers / Fields / Scalar Value Types} .proto und C#
+\paragraph{Protocol Buffers / Fields / Scalar Value Types} .proto und C\#
 
 \begin{minipage}[t]{0.9\textwidth}
 	\centering
@@ -6194,10 +6273,20 @@ public class RpcException : Exception {
 }
 \end{lstlisting}
 \paragraph{Status Codes} \hfill
-\begin{figure}[h!]
-	\subfigure{\includegraphics[width=0.49\linewidth]{images/grpc_status_codes_1.png}}
-	\subfigure{\includegraphics[width=0.49\linewidth]{images/grpc_status_codes_2.png}}
+\begin{figure}[!ht]
+	\centering
+	\begin{minipage}{.5\textwidth}
+		\centering
+		\includegraphics[width=0.49\linewidth]{images/grpc_status_codes_1.png}
+		\caption{$dt=0.1$}
+	\end{minipage}%
+	\begin{minipage}{0.5\textwidth}
+		\centering
+		\includegraphics[width=0.49\linewidth]{images/grpc_status_codes_2.png}
+		\caption{$dt =$}
+	\end{minipage}
 \end{figure}
+
 
 \paragraph{Unbehandelte Exception} Exception wird auf Server nicht gefangen (Server Runtime fängt Exception, Wirft RpcException)
 \begin{lstlisting}
@@ -6220,7 +6309,7 @@ public override async Task<Empty> Trailers(Empty request, ServerCallContext cont
 
 \section{Reflection}
 
-\begin{figure}[h!]
+\begin{figure}[!ht]
 	\centering
 	\includegraphics[width=0.8\linewidth]{images/member_hierarchie}
 	\caption{Typ-Hierarchie}
@@ -6506,19 +6595,19 @@ Reflection.Emit erlaubt neue Assemblies und Typen zur Laufzeit zu erzeugen und s
 	\item ILGenerator $\Rightarrow$ IL-Code erzeugen
 \end{itemize}
 
-\paragraph{Assembly inkl. Module definieren}
+\paragraph{Assembly inkl. Module definieren}\mbox{} \\
 \begin{lstlisting}
 AssemblyName assemblyName = new AssemblyName("Hsr.EmitDemoAssembly");
 AssemblyBuilder assemblyBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndSave);
 ModuleBuilder moduleBuilder = assemblyBuilder.DefineDynamicModule("Hsr.EmitDemoModule", "Hsr.EmitDemoAssembly.dll");
 \end{lstlisting}
 
-\paragraph{Klasse ''EmitDemo'' definieren}
+\paragraph{Klasse ''EmitDemo'' definieren}\mbox{} \\
 \begin{lstlisting}
 TypeBuilder typeBuilder = moduleBuilder.DefineType("EmitDemo", TypeAttributes.Public);
 \end{lstlisting}
 
-\paragraph{Methode ''SayHello'' definieren}
+\paragraph{Methode ''SayHello'' definieren}\mbox{} \\
 \begin{lstlisting}
 Type[] paramTypes = { typeof(string) };
 Type retType = typeof(string);
@@ -6526,7 +6615,7 @@ MethodBuilder methodBuilder = typeBuilder.DefineMethod("SayHelloTo",
         MethodAttributes.Public | MethodAttributes.Virtual, retType, paramTypes);
 \end{lstlisting}
 
-\paragraph{Einfügen der MSIL Operationen in die neu erzeugte Methode}
+\paragraph{Einfügen der MSIL Operationen in die neu erzeugte Methode}\mbox{} \\
 \begin{lstlisting}
 ILGenerator ilGen = methodBuilder.GetILGenerator();
 ilGen.Emit(OpCodes.Ldstr, "Hello ");
@@ -6536,12 +6625,12 @@ ilGen.Emit(OpCodes.Call, mi);
 ilGen.Emit(OpCodes.Ret);
 \end{lstlisting}
 
-\paragraph{Klasse ''EmitDemo'' erzeugen}
+\paragraph{Klasse ''EmitDemo'' erzeugen}\mbox{} \\
 \begin{lstlisting}
 typeBuilder.CreateType();
 \end{lstlisting}
 
-\paragraph{Methode ''SayHello'' ausführen}
+\paragraph{Methode ''SayHello'' ausführen}\mbox{} \\
 \begin{lstlisting}
 MethodInfo method = typeBuilder.GetMethod("SayHelloTo", new[] { typeof(string) });
 object obj = Activator.CreateInstance(typeBuilder);
@@ -6549,7 +6638,7 @@ object ret = method.Invoke(obj, new object[] { "HSR" });
 Console.WriteLine(ret);
 \end{lstlisting}
 
-\paragraph{Assembly ''Hsr.EmitDemoAssembly.dll'' abspeichern}
+\paragraph{Assembly ''Hsr.EmitDemoAssembly.dll'' abspeichern}\mbox{} \\
 \begin{lstlisting}
 assemblyBuilder.Save(assemblyName.Name + ".dll");
 \end{lstlisting}
@@ -6558,16 +6647,16 @@ assemblyBuilder.Save(assemblyName.Name + ".dll");
 % \section{Reflection}
 % Unter Reflection versteht man die Analyse von Metadaten eines Objekts zur Laufzeit. Mit Reflection lassen sich Typen suchen und instanzieren. Die abstrakte Basisklasse \lstinline|System.Type| representiert einen Typen. \lstinline|System.RuntimeType| erbt von \lstinline|System.Type|. Mit Reflection können auch \lstinline|private| Felder gelesen und geschreiben werden.
 
-% \begin{figure}[h!]
+% \begin{figure}[!ht]
 % \centering
-% \includegraphics[width=0.8\linewidth]{MsTe/images/reflection-type-hiearchy}
+% \includegraphics[width=0.8\linewidth]{images/reflection-type-hiearchy}
 % \caption{Reflection Type-Hierarchy}
 % \label{fig:mex}
 % \end{figure}
 
-% \begin{figure}[h!]
+% \begin{figure}[!ht]
 % \centering
-% \includegraphics[width=0.8\linewidth]{MsTe/images/reflection-navigation}
+% \includegraphics[width=0.8\linewidth]{images/reflection-navigation}
 % \caption{Reflection Navigation}
 % \label{fig:mex}
 % \end{figure}
