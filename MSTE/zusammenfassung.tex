@@ -932,7 +932,7 @@ Die Projekte werden als XML-Datei verwaltet in einer \lstinline|*.csproj| Datei.
 		Klasse, Struct & PascalCase & BackColor                  \\
 		Interface      & PascalCase & IComparable                \\
 		Enum           & PascalCase & Color                      \\
-		Delegates      & PascalCase & Action / Func              \\usepackage{layaureo}
+		Delegates      & PascalCase & Action / Func              \\
 		Methoden       & PascalCase & GetDataRow, UpdateOrder    \\
 		Felder         & CamelCase  & name, orderId              \\
 		Properties     & PascalCase & OrderId                    \\
@@ -953,13 +953,14 @@ Die Projekte werden als XML-Datei verwaltet in einer \lstinline|*.csproj| Datei.
 	\centering
 	\begin{tabu} to \linewidth {l l}
 		\toprule
-		Attribut           & Beschreibung                                                                     \\
+		Attribut           & Beschreibung                                                                                          \\
 		\midrule
-		public             & Überall sichtbar                                                                 \\
-		private            & Innerhalb des jeweiligen Typen sichtbar (Klasse/Struct)                          \\
-		protected          & Innerhalb des jeweiligen Typen oder abgeleiteten Klasse sichtbar (Klasse/Struct) \\
-		internal           & Innerhalb des jeweiligen Assemblies sichtbar                                     \\
-		protected internal & Kombination aus internal und protected                                           \\
+		public             & Überall sichtbar                                                                                      \\
+		private            & Innerhalb des jeweiligen Typen sichtbar (Klasse/Struct)                                               \\
+		protected          & Innerhalb des jeweiligen Typen oder abgeleiteten Klasse sichtbar (Klasse/Struct)                      \\
+		internal           & Innerhalb des jeweiligen Assemblies sichtbar                                                          \\
+		protected internal & Kombination aus internal und protected                                                                \\
+		private protected* & Innerhalb des jeweiligen Typen oder abgeleiteter Klasse sichtbar, wenn diese im gleichem Assembly ist \\
 		\bottomrule
 	\end{tabu}
 	\caption{Sichtbarkeiten}
@@ -969,13 +970,13 @@ Die Projekte werden als XML-Datei verwaltet in einer \lstinline|*.csproj| Datei.
 	\centering
 	\begin{tabu} to \linewidth {l l l X}
 		\toprule
-		Typ       & Sichtbarkeit              & Member (default) & Member (zulässig)                                        \\
+		Typ       & Sichtbarkeit              & Member (default) & Member (zulässig)                                                           \\
 		\midrule
-		class     & public, internal(default) & private          & public, protected, internal, private, protected internal \\
-		struct    & public, internal(default) & private          & public, internal, private                                \\
-		enum      & public, internal(default) & public           & -                                                        \\
-		interface & public, internal(default) & public           & -                                                        \\
-		delegate  & public, internal(default) & -                & -                                                        \\
+		class     & public, internal(default) & private          & public, protected, internal, private, protected internal, private protected \\
+		struct    & public, internal(default) & private          & public, internal, private                                                   \\
+		enum      & public, internal(default) & public           & -                                                                           \\
+		interface & public, internal(default) & public           & -                                                                           \\
+		delegate  & public, internal(default) & -                & -                                                                           \\
 		\bottomrule
 	\end{tabu}
 	\caption{Standard Sichtbarkeiten von Typen}
@@ -1227,7 +1228,7 @@ int[] array4 = {1,2,3,4,5,6}; // vereinfachte syntax ohne Typ / new
 object[] array5 = new object[5]; // deklaration ref type
 array1.Length // Get Length
 
-// Blockmatritzen (Mehrdimensionale Arrays (rechteckig))  (Speichereffizienter und schneller im Zugriff)
+// Blockmatritzen (Mehrdimensionale Arrays (rechteckig))  (Speichereffizienter, schnelleres Allozieren, schnellere Garbage Collection und vermeintlich schneller im Zugriff (Boundary Check wird nur bei 1-dimensionalen Array optimiert))
 int[,] array1 = new int[3,2]; // Deklaration
 int length = array1.Length; // Liefert 6
 int length0 = array1.GetLength(0); // Liefert 3 (Laenge 0. Dimension)
@@ -1268,9 +1269,9 @@ myList[4];
 myList.IndexOf(4);
 \end{lstlisting}
 
-
+\pagebreak
 \subsection{Namespaces}
-Namespaces entspricht dem Package in Java und lässt den Code hierarchisch strukturieren. Ein Namespace ist nicht an die physische Struktur gebunden (in Java schon). Ein file kann mehrere Namespaces beinhaltet und ein Namespace kann in verschiedenen Files definiert sein.
+Namespaces entspricht dem Package in Java und lässt den Code hierarchisch strukturieren. Ein Namespace ist nicht an die physische Struktur gebunden (in Java schon). Ein file kann mehrere Namespaces beinhaltet und ein Namespace kann in verschiedenen Files definiert sein. Er kann andere Namespaces, Klassen, Interfaces, Structs, Enums und Delegates enthalten.
 \begin{lstlisting}
 namespace A {
 	using C;
@@ -1280,6 +1281,47 @@ namespace A {
 }
 \end{lstlisting}
 
+Neu, wenn nur ein Namespace in einer Datei folgende Schreibweise präferiert. Spart in jeder Zeile 4 Zeichen (File-scoped Namespace). Nur ein Namespace pro File ist so dann erlaubt:
+\begin{lstlisting}
+namespace A;
+//.... Code ....
+\end{lstlisting}
+
+Namespace können auch mittels Alias-Namen geladen werden:
+\begin{lstlisting}
+using F = System.Windows.Forms;
+//.... Code ....
+F.Button b;
+\end{lstlisting}
+
+Weiter gibt es auch globale Imports (Meist Datei GlobalUsings.cs). Dies geht auch implizit via *csproj-Datei. Nicht jede SDK supported diese Funktion:
+\begin{lstlisting}
+using static Azure.Core;
+\end{lstlisting}
+
+\subsection{Main Methode}
+Die Main Methode ist die Einstiegspunkt in die Anwendung. Sie ist zwingend für Executables (Console Application, Windows Application, etc.). Darf genau einmal Vorkommen. Wenn es mehrere gibt, muss mann in der csproj-Datei explizit angeben, welche verwendet werden soll. Sie befindet sich meist in der Datei Program.cs. Sie muss folgende Signatur haben:
+\begin{lstlisting}
+// Expamles
+static void Main() { }
+static int Main() { }
+static void Main(string[] args) { }
+static int Main(string[] args) { }
+static async Task Main() { }
+static async Task<int> Main() { }
+static async Task Main(string[] args) { }
+static async Task<int> Main(string[] args) { }
+\end{lstlisting}
+
+Auf Arbumente kann unterschiedlich zugegriffen werden. Per Default greift man über ein string[]-Parameter zu. Ohne diesen Parameter ist es auch möglich über die statische Methode \lstinline|System.Environment.GetCommandLineArgs();| darauf zuzugreifen. Neu kann auch die Main-Methode als entry-Point weggelassen werden dank Top-level Statements. Die Regeln sind folgende:
+\begin{itemize}
+	\item Nur 1x pro Assembly erlaubt
+	\item Argumente heissen fix \lstinline|args|
+	\item Exit Codes elaubt: \lstinline|return someIntValue;|
+	\item VOR dem top-level Statements können usings definiert werden
+	\item NACH dem top-level Statements können Typen definiert werden
+\end{itemize}
+
 \section{Variablen und Properties}
 \subsection{Konstanten}
 Der Wert einer Konstante muss zur Compilezeit verfügbar sein.
@@ -1288,7 +1330,7 @@ const long size = int.MaxValue;
 \end{lstlisting}
 
 \subsection{ReadOnly}
-Readonly Felder müssen in der Deklaration oder im Konstruktor initialisert werden. Readly Variablen sind äquivalent mit Java final Felder
+Readonly Felder müssen in der Deklaration oder im Konstruktor initialisert werden. Readonly Variablen sind äquivalent mit Java final Felder
 \begin{lstlisting}
 	readonly DateTime date1 = DateTime.Now;
 	
@@ -1530,8 +1572,8 @@ Sub s = b as Sub; // returns null if cast not possible
 \subsubsection{Typprüfung}
 Die Typprüfung gibt \lstinline|true| wenn:
 \begin{itemize}
-	\item Typ von «obj» identisch wie «T» ist (exakt gleicher Typ)
-	\item Typ von «obj» eine Sub-Klasse von «T» ist
+	\item Typ von "obj" identisch wie "T" ist (exakt gleicher Typ)
+	\item Typ von "obj" eine Sub-Klasse von "T" ist
 \end{itemize}
 \begin{lstlisting}
 class Base {}
@@ -1642,8 +1684,8 @@ static class MyMath {
 	\item Stucts sollten in folgenden Fällen verwendet werden
 	      \begin{itemize}
 		      \item Repräsentiert einen einzelnen Wert
-		      \item Instanzgrösse ist kleiner als 16 Byte
-		      \item Ist “immutable” (nicht der default)
+		      \item Instanzgrösse ist kleiner als 16 Byte (128 Bit)
+		      \item Ist "immutable" (nicht der default)
 		      \item Wird nicht häufig geboxt
 		      \item Ist entweder kurzlebig oder wird meist in andere Objekte eingebettet
 	      \end{itemize}
@@ -1796,7 +1838,7 @@ if (today == Days.Monday) { /* ... */ }
 // Two ways to parse Enum out of a String
 Enum.Parse(typeof(Days), "Monday");
 MyEnum myEnum;
-Enum.TryParse("Monday", out myMonday);
+Enum.TryParse("Monday", out myMonday); // returns true if successful
 
 // Print all Enum Types
 foreach(string name in Enum.GetNames(typeof(Days))) {
