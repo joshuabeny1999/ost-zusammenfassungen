@@ -1394,6 +1394,9 @@ class MyClass
 	}
 \end{lstlisting}
 
+\subsubsection{Abstrakte Properties/Indexes}
+Abstrakte Properties/Indexes haben kein Anweisungsteil. Get und Set werden analog der Auto Properties mit einem Semikolon abgeschlossen. Wichtig ist das bei der Implementation Get und Set Kombination identisch sein muss.
+
 \section{Methoden}
 Im C\# hat man zwei verschiedene Ausprägungen von Methoden:
 \begin{itemize}
@@ -1531,8 +1534,8 @@ Man spricht von Dynamic Binding, wenn die Methoden des dynamischen Typs aufgeruf
 	\item Suche Vererbungs-Hierarchie von oben nach unten nach konkrester Methode mit Schlüsselwort \lstinline|override|
 \end{itemize}
 
-\subsection{Abstrakte Klassen}
-Abstrakte Klassen haben statt dem Anweisungteil ein Semikolon und sind implizit \lstinline|virtual|, dürfen jedoch \textbf{nicht} \lstinline|static| oder \lstinline|virtual| sein.
+\subsection{Abstrakte Methoden}
+Abstrakte Methoden haben statt dem Anweisungteil ein Semikolon und sind implizit \lstinline|virtual|, dürfen jedoch \textbf{nicht} \lstinline|static| oder \lstinline|virtual| sein.
 \begin{lstlisting}
 abstract class Sequence { public abstract void Add(object x); }
 \end{lstlisting}
@@ -1800,6 +1803,7 @@ Folgende Operatoren können überladen werden
 	\item Member dürfen nicht \lstinline|static| oder ausprogrammiert sein
 	\item In der Klasse, welche Interface implementiert, müssen alle Interface-Member vorhanden sein.
 	\item \lstinline|override| ist nicht nötig
+	\item Seit C\# 8.0 können Interfaces auch Default-Implementationen haben und so dennoch programmiert werden.
 \end{itemize}
 \begin{lstlisting}
 	interface ISequence {
