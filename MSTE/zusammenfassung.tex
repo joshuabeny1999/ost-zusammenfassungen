@@ -682,8 +682,8 @@ Referenzen werden beim CSC mittels \lstinline|csc /target:exe /r:MyDLL.dll Progr
 	\item .NET Core oder .NET Standard SDK
 	      \begin{itemize}
 		      \item Zwingend
-		      \item Normalerweise: «Microsoft.NETCore.App»
-		      \item Bei .NET Standard «NETStandard.Library»
+		      \item Normalerweise: "Microsoft.NETCore.App"
+		      \item Bei .NET Standard "NETStandard.Library"
 	      \end{itemize}
 \end{itemize}
 
@@ -1905,14 +1905,17 @@ public interface IBuffer<out T>
 		\midrule
 		where T : struct          & T muss ein Value Type sein.                                                                            \\
 		where T : class           & T muss ein Reference Type sein. Darunter fallen auch Klassen, Interfaces, Delegates                    \\
-		where T : new()           & T muss einen \textbf{parameterlosen} «public» Konstruktor haben. Wird benötigt um new T() zu erstellen
+		where T : new()           & T muss einen \textbf{parameterlosen} "public" Konstruktor haben. Wird benötigt um new T() zu erstellen
 		Dieser Constraint muss – wenn mit anderen kombiniert – \textbf{immer zuletzt
 		aufgeführt} werden                                                                                                                 \\
-		where T : «ClassName»     & T muss von Klasse «ClassName» ableiten.                                                                \\
-		where T : «InterfaceName» & T muss Interface «InterfaceName» implementieren.                                                       \\
+		where T : "ClassName"     & T muss von Klasse "ClassName" ableiten.                                                                \\
+		where T : "InterfaceName" & T muss Interface "InterfaceName" implementieren.                                                       \\
 		where T : TOther          & T muss identisch sein mit TOther.
 		oder
 		T muss von TOther ableiten.                                                                                                        \\
+		where T : class?          & T muss eine Nullable Reference Type sein.
+		Darunter fallen auch Klassen, Interfaces, Delegates. (Mehr im nächsten Kapitel)                                                    \\
+		where T : not null        & T musse in Non-Nullable Value Type oder Reference Type sein.                                           \\
 		\bottomrule
 	\end{tabu}
 	\caption{Type Constraints}
@@ -1993,8 +1996,241 @@ Es gibt eine Liste von generischen Collections, hier einige davon:
 	\item \lstinline| Queue<T>|
 \end{itemize}
 
+\section{Nullability}
+Tony Hoare nennt das Einführen der Null Reference als "Bilion-Dollar-Mistake".
+
+\subsection{Default operator \/ literal}
+\lstinline|default(T) / default| liefert den Default-Wert für angegebene Typen. Bei Reference Types ist die \lstinline|null|. Bei Value Types ist dies entweder \lstinline|0|, \lstinline|false| oder \lstinline|\0|. Bei Vergleiche ()\lstinline|x is null|) gibt es folgendes Verhalten:
+\begin{description}
+	\item[Reference Types] \lstinline|true| wenn \lstinline|x| \lstinline|null| ist, ansonsten \lstinline|false|
+	\item[Value Types] \lstinline|false| in jedem Fall. Compilerfehler wenn \lstinline|T : struct|
+\end{description}
+\begin{lstlisting}
+public void NullExamples<T>()
+{
+	// Nullwerte zuweisen
+	T x1 = null; // Compilerfehler
+	T x2 = 0; // Compilerfehler
+	T x3 = default(T); // OK
+	T x4 = default; // OK (C# 7.1)
+
+	// Nullwerte prüfen
+	if (x1 is null)
+	{
+	/* ... */
+	}
+}
+\end{lstlisting}
+
+\subsection{Structs / Value Types}
+Null-Zustand exisitert nicht und muss quasi erzwungen werden (Seit 2002 /.NET 2.0 C\# 2).
+
+\subsubsection{Struct <Nullable>}
+Value Types kann nun dank Generics "null" zugewiesen werden. Dazu dient die Klasse \lstinline|System.Nullable<T>|.
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{lll}
+		\textbf{Status} & \textbf{HasValue} & \textbf{Value} \\
+		null            & false             & ?              \\
+		not null        & true              & 123
+	\end{tabular}
+	\caption{Werte je nach Status}
+\end{table}
+
+Wenn auf Value zugegriffen wird und \lstinline|HasValue| \lstinline|false| ist, wird eine \lstinline|System.InvalidOperationException| geworfen.
+
+\begin{lstlisting}
+public struct Nullable<T>
+where T : struct
+{
+	public Nullable(T value);
+
+	public bool HasValue { get; }
+	public T Value { get; }
+}
+\end{lstlisting}
+
+\subsubsection{T? Syntax}
+Die \lstinline|T?| Syntax dient zur verbesserung der Lesbarkeit. So kann \lstinline|null| direkt zugewiesen werden.
+\begin{lstlisting}
+int? x = 123;
+int? y = null;
+\end{lstlisting}
+
+\subsubsection{Sicheres Lesen \& Type Casts}
+\begin{lstlisting}
+int? x = null;
+
+// Klassisch
+int x1 = x.HasValue
+	? x.Value
+	: default;
+
+// Via Methode
+int x2 = x.GetValueOrDefault();
+
+// Via Methode inkl. eigenem Default
+int x3 = x.GetValueOrDefault(-1);
+\end{lstlisting}
+
+\subsection{Klassen / Reference Types}
+Null-Zustand ist in Runtime abgebildet. Zugriff auf Null References führt zu \lstinline|NullReferenceException|. Dies ist nicht mehr eliminierbar. Doch Compiler bietet seit C\# 8 vermeidung von Zugriff auf Null Referenzen an. (Seit 2019 / .NET Core 3.0 / C\# 8)
+Compiler generiert Warnungen basierend auf "static flow analysis".
+\newline\newline
+Hinweis: Implementation unterscheidet sich massiv von "Nullable Value Types"
+\subsubsection{Syntax}
+Die Compiler Warnungen können im .csproj aktiviert werden innerhalb der \lstinline|<PropertyGroup>| mittels \lstinline|<Nullable>enable</Nullable>| und deaktiviert mittels \lstinline|<Nullable>disable</Nullable>|. Die Warnungen können auch im Code via Präprozessor Direktiven mittels \lstinline|#nullable enable| aktiviert und mit \lstinline|#nullable disable|  deaktiviert werden.
+\newline\newline
+Eine Variable kann mittels \lstinline|?| als "nullable" deklariert werden. Weiter gibt es den Null-forgiving Operator \lstinline|!|, welcher den Compiler verspricht, dass die Variable nicht \lstinline|null| ist. Dies ist sehr gefährlich und sollte nur mit bedacht eingesetzt werden, da Compile Time != Runtime (inkonsistent).
+\begin{lstlisting}
+string? nameNull = null;
+string name = nameNull; // Warning
+
+if (nameNull is null) // or "name == null"
+{
+	name = nameNull; // Warning
+	name = nameNull!; // OK, but wrong
+}
+else
+{
+	name = nameNull; // OK
+}
+\end{lstlisting}
+
+\subsection{Syntatic sugar}
+\subsubsection{is null \/ is not null (Pattern matching)}
+\begin{description}
+	\item[Value Types] Verwendet \lstinline|System.Nullable<T>.HasValue|
+	\item[Reference Types] Prüft ob es sich um eine Null Referenz handelt mittels \lstinline|object.ReferenceEquals()|
+\end{description}
+
+Der \lstinline|==| Operator sollte nicht verwendet werden, da er manuell überschrieben worden sein könnte.
+\begin{lstlisting}
+int? x = null;
+string s = null;
+
+bool b1a = x is null; // true
+bool b1b = x is not null; // false
+	
+bool b2a = s is null; // true
+bool b2b = s is not null; // false
+\end{lstlisting}
+
+\subsubsection{?? (Null-Coalescing Operator)}
+Binäre Operator. Gibt den Linken Teil zurück, sofern nicht null. Ansonsten wird der Rechte Teil zurückgegeben.
+\begin{lstlisting}
+int? x = null;
+int i = x ?? -1; \\ -1
+
+\\ Auch möglich
+int i = x ?? throw new ArgumentNullException(nameof(x));
+\end{lstlisting}
+\subsubsection{??= (Null-Coalescing Assignment)}
+Setzt die Variable (linker Teil) auf einen gewünschten wert, sofern diese Variable null ist. Keine Operation wenn die Variable ungleich null ist.
+\begin{lstlisting}
+int? x = null;
+int i ??= -1; \\ x hat nun Wert "-1"
+
+int? x = 10;
+int i ??= -1; \\ x hat immernoch Wert "10"
+\end{lstlisting}
+
+\subsubsection{?. (Null-Conditional Operator)}
+Führt den rechten Teil aus, sofern der linke Teil nicht null ist. Andernfalls wird null geliefert. (Sofern Methode nicht void liefert). Funktioniert auch mit Delegates über \lstinline|.Invoke()|.
+\begin{lstlisting}
+object o = null;
+Action a = null;
+
+string s = o?.ToString(); // null
+a?.Invoke();
+\end{lstlisting}
+
+\section{Record Types}
+Record Types sind ein reines Compiler Feature und dienen zum erstellen von Datenrepräsentations-Klassen und Reduktion von Boilerplate Code.
 
 
+\begin{description}
+
+	\item[Vereinfacht] Arbeit mit Nullable Reference Types.
+	\item[Grundidee] Record Types sollten immutable sein.
+\end{description}
+\begin{lstlisting}
+	public record [class|struct] Person(int Id, string Name);
+\end{lstlisting}
+
+Folgender Code wird generiert:
+\begin{itemize}
+	\item Konstruktor
+	\item Properties (Immutable)
+	\item Value equality
+	\item Darstellung (ToStringMethode, etc.)
+	\item Vererbung wird berücksichtigt (z.B. Equality)
+
+\end{itemize}
+\subsection{Deklarationsmöglichkeiten}
+Eine manuelle Deklaration wie normale Klassen ist möglich. So werden teilweise To-String und Value Equality generiert. Besser ist: Positional Syntax verwenden (Siehe oben)
+\begin{lstlisting}
+public record Person
+{
+    public Person() : this(0, "") { }
+    public Person(int id, string name)
+    {
+        Id = id;
+        Name = name;
+	}
+
+    public int Id { get; init; }
+    public string Name { get; init; }
+}
+
+// Anwendungsbeispiel
+Person p1 = new();
+Person p2 = new(1, "Mary");
+\end{lstlisting}
+
+Man kann auch eine gemischte Variante nutzen. Um so eigene Methoden zu erweitern. Wichtig: Generierte Properties werden als Init-Only setter generiert. Man kann so eine Warnung herausgeben, wenn Name leer.
+\begin{lstlisting}
+public record Person(int Id)
+{
+    public string Name { get; init; }
+    public void DoSomething() { }
+}
+
+// Anwendungsbeispiel
+Person p1 = new(0);
+p1.Id = 0; // Compilerfehler
+p1.Name = ""; // Compilerfehler
+Person p2 = new(0) { Name = "" }; // OK
+\end{lstlisting}
+
+\subsection{Value Equality}
+Der generierte Code zu Value equality vergleicht alle Properties und macht KEINE Reference-Equality. Involviert auch Properties allfälliger Basisklassen.
+\begin{lstlisting}
+public record Person(int Id, string Name);
+
+// Anwendungsbeispiel
+Person p1 = new(0, "Mary");
+Person p2 = new(0, "Mary");
+bool eq1 = p1 == p2; // true
+bool eq2 = p1 != p2; // false
+bool eq3 = p1.Equals(p2); // true
+bool eq4 = ReferenceEquals(p1, p2); // false
+\end{lstlisting}
+
+\subsection{Nondestructive mutation}
+Da Immutable, müssen Records kopiert werden, will man was ändern. Dazu gibt es das Schlüsselwört \lstinline|with|.
+\begin{lstlisting}
+public record Person(int Id, string Name);
+
+// Anwendungsbeispiel
+Person p1 = new(0, "Mary");
+
+Person p2 = p1 with { Id = 1 };
+bool eq2 = p1 == p2; // false
+
+Person p3 = p1 with { };
+bool eq3 = p1 == p3; // true
+\end{lstlisting}
 \section{Delegates}
 Ein Delegate ist ein eigener \textbf{Referenztyp} und wird daher grundsätzlich ausserhalb von Klassen definiert. Jedes Delegate erbt von der Klasse \lstinline|MulticastDelegate|. Er bietet eine Vereinfachung von Interfaces. Delegates können als Ersatz für das Factory und Template Method Pattern verwendet werden.
 Genutzt werden Delegates vor allem für zwei Dinge:
@@ -2023,22 +2259,30 @@ Delegates werden so verwendet:
 \begin{lstlisting}
 // Deklaration eines Delegate-Typs 
 public delegate void Notifier(string sender);
-    class Examples {
-        public static void Test() {
-            // Deklaration Delegate-Variable
-            Notifier greetings;
-            // Zuweisung einer Methode 
-            greetings = new Notifier(SayHi);
-            // Kurzform 
-            greetings = SayHi;
-            // Aufruf einer Delegate-Variable 
-            greetings("John"); // "Hello John"
+    
+class Examples {
+    public static void Test() 
+	{
+        // Deklaration Delegate-Variable
+        Notifier greetings;
+        // Zuweisung einer Methode 
+        greetings = new Notifier(SayHi);
+        // Kurzform 
+        greetings = SayHi;
+        // Aufruf einer Delegate-Variable 
+        greetings("John"); // "Hello John"
             
-            Notifier greetings2;
-            // anonyme Methode zugewiesen
-            greetings2 = delegate(string sender) { Console.WriteLine("We say: Ciao {0}", sender); };
-            greetings2("Seppo"); // "Ciao Seppo"
-        }
+        Notifier greetings2;
+        // anonyme Methode zugewiesen
+        greetings2 = delegate(string sender) { Console.WriteLine("Ciao {0}", sender); };
+        greetings2("Seppo"); // "Ciao Seppo"
+    }
+
+	private static void SayHi(string sender)
+	{
+		Console.WriteLine("Hello {0}", sender)
+	}
+}
 \end{lstlisting}
 
 \begin{figure}[ht]
@@ -2048,7 +2292,7 @@ public delegate void Notifier(string sender);
 \end{figure}
 
 \subsection{Multicast Delegates}
-Jedes Delegate ist auch ein Multicast Delegate. Im Unterschied zum normalen Delegate beinhaltet das Multicast Delegate mehrere Methoden. Weitere Methoden können mit += hizugefügt und mit -= wieder entfernt werden. Die Methode werden dann nacheinander aufgerufen. (Intern Linked List). Lamdas werden vom Compiler als Delegate abgebildet.  Speichert man den Rückgabewert bei der Ausführung des Delegates ab, entspricht dieser dem Rückgabewert des letzten Funktionsaufruf, sofern dieses ein Return-Value hatte.
+Jedes Delegate ist auch ein Multicast Delegate. Im Unterschied zum normalen Delegate beinhaltet das Multicast Delegate mehrere Methoden. Weitere Methoden können mit += hizugefügt und mit -= wieder entfernt werden. Die Methode werden dann nacheinander aufgerufen. (Intern Linked List). Lamdas werden vom Compiler als Delegate abgebildet.  Speichert man den Rückgabewert bei der Ausführung des Delegates ab, entspricht dieser dem \textbf{Rückgabewert des letzten Funktionsaufruf}, sofern dieses ein Return-Value hatte.
 \begin{lstlisting}
 // keyword delegate
 public delegate void Notifier(string sender);
@@ -2088,7 +2332,9 @@ public delegate void Action(int i);
 public class MyClass
 {
     public static void PrintValues(int i)
-    { Console.WriteLine("Value {0}", i); }
+    { 
+		Console.WriteLine("Value {0}", i);
+	}
     public void SumValues(int i) { Sum += i; }
     public int Sum { get; private set; }
 }
@@ -2131,7 +2377,7 @@ Value 8
 Value 14
 Value 22
 ForAll called...
-// Konsolen Ausgabe v2
+// Konsolen Ausgabe v2 
 ForAll called...
 --- Sum 50
 ForAll called...
@@ -2147,7 +2393,7 @@ public static void Test() {
 \end{lstlisting}
 
 \subsection{Anonyme Methoden}
-Mit anonymen Methoden ist keine Deklaration einer Methode nötig. Methodencode wird in-place angegeben. Ebenfalls hat eine Methode Zugriff auf lokale Variablen (im unteren Beispiel \lstinline|sum|). Besser mit Lambdas lösen.
+Mit anonymen Methoden ist keine Deklaration einer Methode nötig. Methodencode wird in-place angegeben. Ebenfalls hat eine Methode Zugriff auf lokale Variablen (im unteren Beispiel \lstinline|sum|). \textbf{Besser mit Lambdas lösen!}
 
 \begin{lstlisting}
 class AnonymousMethods { 
@@ -2161,6 +2407,7 @@ class AnonymousMethods {
 \end{lstlisting}
 
 \subsection{Callbacks}
+\textbf{Besser mit Events lösen!}
 \begin{lstlisting}
 public delegate void TickEventHandler (int ticks, int interval);
 
@@ -2231,7 +2478,7 @@ public class Subscriber {
 	
 	// match with delegate
 	public void OnTimeChanged(object source, CustomEventArgs args) {
-		.. 
+		/*... */ 
 	}
 }
 
@@ -2242,7 +2489,7 @@ public class CustomEventArgs : EventArgs {
 
 // Model
 public class Custom {
-	..
+	/*... */ 
 }
 
 // 7. use it
@@ -2261,7 +2508,7 @@ static void Main(string[] args) {
 \subsection{EventHandler}
 Ein EventHandler hat folgende Eigenschaften:
 \begin{description}
-	\item[Standard Syntax bei Events] \lstinline|public delegate void AnyHandler(object sender, AnyEventArgs e); |
+	\item[Standard Syntax] \lstinline|public delegate void AnyHandler(object sender, AnyEventArgs e); |
 	\item [1. Parameter] \lstinline|object sender|:
 	      \begin{itemize}
 		      \item Sender des Events
@@ -2269,13 +2516,13 @@ Ein EventHandler hat folgende Eigenschaften:
 	      \end{itemize}
 	\item [2. Parameter] \lstinline|AnyEventArgs e|:
 	      \begin{itemize}
-		      \item Beliebige Sub-Klasse von «EventArgs»
+		      \item Beliebige Sub-Klasse von \lstinline|EventArgs|
 		      \item Enthält Informationen zum Event (z.B. Linke oder Rechte Maustaste beim Klick, etc.)
 		      \item Begründung: Argumente können jeder ergänzt werden ohne Anpassung der Signatur
 	      \end{itemize}
 \end{description}
 
-Anstelle eines eigenen EventHandler kann man auch den bestehenden \lstinline|EventHandler<EventArgs| nutzen.
+Anstelle eines eigenen EventHandler kann man auch den bestehenden \lstinline|EventHandler<EventArgs>| nutzen.
 \begin{lstlisting}[caption=C\# Event Handler]
 public delegate void ClickEventHandler(obj sender, AnyEventArgs e);
 
@@ -2296,14 +2543,14 @@ public class Usage {
 	
 	// click handler
 	private void OnClick(sender, ClickEventArgs eventargs) {
-		...
+		/*...*/
 	}
 }
 \end{lstlisting}
 
 \section{Lambdas}
 \begin{itemize}
-	\item Lambdas können mehrere 0 oder mehrere Parameter haben
+	\item Lambdas können 0 oder mehrere Parameter haben
 	\item Der Typ der Parameter darf weggelassen werden
 	\item Man unterscheidet zwischen \textbf{Statement Lambdas} (Mit geschweiften Klammern) und \textbf{Expression Lambdas} (einzelner Ausdruck, kein return nötig). Ein Lambda kann als \lstinline|Func<>| Typ gespeichert werden.
 \end{itemize}
@@ -2507,8 +2754,8 @@ Mit dem Verwenden von Extension Methods mit Iterationen kann so eine Query-Opera
 \begin{itemize}
 	\item Erweitern alle Collections die IEnumerable implementieren
 	\item Liefern in der Regel wieder ein IEnumerable
-	\item Können mit dem «.»-Operator verkettet werden
-	\item Werden «deferred» (aufgeschoben) evaluiert
+	\item Können mit dem "."-Operator verkettet werden
+	\item Werden "deferred" (aufgeschoben) evaluiert
 \end{itemize}
 Mit dem this-Kontext, welcher der Extension Methode mitgegeben wird, macht man die Verbindung zu der Collection.
 
@@ -2829,7 +3076,7 @@ var q = from s in Students
 \subsubsection{Group Joins}
 Ein Group Join verwendet die \lstinline|into| Expression.
 \begin{lstlisting}
-// Pro «Student» wird eine Liste für alle «Markings» erstellt 
+// Pro "Student" wird eine Liste für alle "Markings" erstellt 
 var q =
 	from s in Students
 	join m in Markings on s.Id equals m.StudentId
@@ -3069,7 +3316,7 @@ Task task = Task
 \begin{itemize}
 	\item Ruft eine Methode auf ohne auf das Resultat zu warten
 	\item Möglichkeit zur Benachrichtigung bei Fertigstellung (Callback)
-	\item Oder: Rückgabe eines «Task» Objektes auf welchem Status abgefragt werden kann
+	\item Oder: Rückgabe eines "Task" Objektes auf welchem Status abgefragt werden kann
 \end{itemize}
 \subsection{async / await}
 \paragraph{async}
@@ -3084,8 +3331,8 @@ Task task = Task
 \end{itemize}
 \paragraph{await}
 \begin{itemize}
-	\item Alles nach «await» ist wird vom Compiler zu einer «Continuation» umgewandelt (es wird also nicht blockiert)
-	\item Nur in «async» Methoden erlaubt
+	\item Alles nach "await" ist wird vom Compiler zu einer "Continuation" umgewandelt (es wird also nicht blockiert)
+	\item Nur in "async" Methoden erlaubt
 \end{itemize}
 \clearpage
 \paragraph{Beispiel / Download Content mit await} \hfill
@@ -7019,17 +7266,17 @@ assemblyBuilder.Save(assemblyName.Name + ".dll");
 % \appendix
 
 % % Code Listings
-% \lstlistoflistings
+%\lstlistoflistings
 
 % % List of figures
-% \listoffigures
+%\listoffigures
 
 % % List of tables
-% \listoftables
+%\listoftables
 
 % % Bibliography
-% \bibliographystyle{plain} 
-% \bibliography{literatur}
+%\bibliographystyle{plain}
+%\bibliography{literatur}
 
 \end{document}
 
