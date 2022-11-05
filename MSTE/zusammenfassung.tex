@@ -2658,7 +2658,6 @@ public interface IEnumerator<out T> : IDisposable, IEnumerator {
 }
 \end{lstlisting}
 
-\clearpage
 
 \subsection{Interator Methoden und Yield Return}
 \begin{itemize}
@@ -2761,7 +2760,7 @@ Mit dem this-Kontext, welcher der Extension Methode mitgegeben wird, macht man d
 
 \begin{lstlisting}
 public static class MyExtensions {
-	public static IEnumerable<T> HsrWhere<T> (this IEnumerable<T> source, Predicate<T> predicate) {
+	public static IEnumerable<T> OstWhere<T> (this IEnumerable<T> source, Predicate<T> predicate) {
 		foreach (T item in source) {
 			if (predicate(item)) {
 				yield return item;
@@ -2769,7 +2768,7 @@ public static class MyExtensions {
 		}
 	}
 	
-	public static IEnumerable<T> HsrOfType<T> (this IEnumerable source) {
+	public static IEnumerable<T> OstOfType<T> (this IEnumerable source) {
 		foreach (object item in source) {
 			if (item is T ) {
 				yield return (T)item;
@@ -2790,10 +2789,11 @@ IEnumerable<int> res = list
 \section{Exceptions}
 Wie auch in anderen Sprachen behandeln Exceptions unerwartete Programmstati oder Ausnahmeverhalten zur Laufzeit. Sie sind Fehlercodes vorzuziehen.
 
-Es wird pro Exception nur ein catch-Block ausgeführt. Jede Exception muss von System.Exception erben. Es gibt keine \lstinline|throws| Anmerkung am Methoden Kopf. In C\# sind alle Exception Unchecked Exceptionn (müssen nicht behandelt werden.)
+Es wird pro Exception nur ein catch-Block ausgeführt. Jede Exception muss von System.Exception erben. Es gibt keine \lstinline|throws| Anmerkung am Methoden Kopf.
+In C\# sind alle Exception Unchecked Exceptionn (müssen nicht behandelt werden.)
 \begin{lstlisting}
 try {
-// code to execute
+    // code to execute
 } catch (FileNotFoundException e) {
 } catch (IOException) {
 	// optional var name, if not needed
@@ -2817,7 +2817,7 @@ catch (Exception e) { throw; }
 
 \begin{figure}[ht]
 	\centering
-	\includegraphics[width=0.5\linewidth]{images/exception_classes}
+	\includegraphics[width=\linewidth]{images/exception_classes}
 	\caption{Exception Klassen}
 	\label{fig:exceptionclasses}
 \end{figure}
