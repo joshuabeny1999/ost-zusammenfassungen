@@ -2830,6 +2830,109 @@ try {
 } catch (Exception e) when (DateTime.Now.Hour >= 18) {}
 \end{lstlisting}
 
+\section{Direct Initialization}
+
+\subsection{Object Initializers}
+Object Initialisierer erlaubt das Instanzieren und Initialisieren einer Klasse in einem einzigen Statement. Die Objekte lassen sich auch erzeugen, wenn kein passender Konstruktor zur Verfügung steht.
+\begin{lstlisting}
+	Student s1 = new Student("John") {
+		Id = 2009001,
+		Subject = "Computing"
+	};
+	Student s2 = new Student {
+		Name = "Ann",
+		Id = 2009002,
+		Subject = "Mathematics"
+	};
+	
+	// Object Initializers zusammen mit Lamdas
+	int[] ids = { 2009001, 2009002, 2009003 };
+	IEnumerable<Student> students = ids.Select(n => new Student { Id = n });
+\end{lstlisting}
+
+\subsection{Collection Initializers}
+Ist das selbe wie Objekte Initializers, jedoch mit Listen.
+\begin{lstlisting}
+	List<int> l1 = new List<int> { 1, 2, 3, 4 };
+	Dictionary<int, string> d1 = new Dictionary<int, string>
+	{
+		{ 1, "a" },
+		{ 2, "b" },
+		{ 3, "c" }
+	};
+	d1 = new Dictionary<int, string> {
+		[1] = "a",
+		[2] = "b",
+		[3] = "c"
+	};
+	
+	object s = new Dictionary<int, Student>
+	{
+		{ 2009001, new Student("John") {
+				Id = 2009001,
+				Subject = "Computing" } },
+		{ 2009002, new Student {
+				Name = "Ann", Id = 2009002,
+				Subject = "Mathematics" } }
+	};
+\end{lstlisting}
+\subsection{Kombination aus Object und Collection Initializers}
+//Kombination Object und Collection Initializers
+\begin{lstlisting}
+object s = new Dictionary < int, Student >
+{
+  {
+       2009001,
+       new Student("John") {
+        Id = 2009001, Subject = "Computing"
+       }
+  },
+  {
+      2009002,
+      new Student {
+        Name = "Ann", Id = 2009002, Subject = "Mathematics"
+      }
+  }
+};
+\end{lstlisting}
+
+\subsection{VAR: Anonymous Types}
+\begin{itemize}
+	\item Mit dem Schlüsselwort \lstinline|var| wird der Typ vom Compiler herausgefunden
+	\item \lstinline|var| kann nur für lokale Variablen verwendet werden. Der Einsatz bei Parametern, Klassenvariablem und Properties ist nicht erlaubt.
+	\item Der Typ wird aus der Zuweisung abgeleitet, wobei die Variable zu 100\% typensicher bleibt.
+	\item Wird meistens in LINQ Queries verwendet (um Zwischenresultate zu speichern)
+	\item \textbf{Wichtig:} Properties von Anonymen Typen sind immer readonly.
+\end{itemize}
+
+\begin{lstlisting}
+class Student {
+ public string Name;
+ public int Id;
+ public string Subject {
+  get;
+  set;
+ }
+ public Student() {}
+ public Student(string name) {
+  Name = name;
+ }
+}
+public class Examples {
+ public void Test() {
+  var a = new {
+   Id = 1, Name = "John"
+  };
+  var b = new {
+   a.Id, a.Name
+  };
+  var studentList = new List < Student > ();
+  var q = studentList.GroupBy(s => s.Subject).Select(grp => new {
+   Subject = grp.Key, Count = grp.Count()
+  });
+ }
+}
+\end{lstlisting}
 
 \section{LINQ: Language Integrated Query}
 LINQ erlaubt eine Query Syntax um Abfragen an beliebigen Datenstrukturen zu machen. Man unterscheidet den Extension- und Query Expression Syntax (Erinnert an SQL), wobei beide die gleichen Dinge erlauben. (Sie erzeugen den selben \textit{msil} Code) Auch LINQ ist reines Compiler Feature.
@@ -3074,7 +3177,7 @@ var q = from s in Students
 \end{lstlisting}
 
 \subsubsection{Group Joins}
-Ein Group Join verwendet die \lstinline|into| Expression.
+Ein Group Join verwendet die \lstinline|into| Expression. s bleibt sichtbar
 \begin{lstlisting}
 // Pro "Student" wird eine Liste für alle "Markings" erstellt 
 var q =
@@ -3181,109 +3284,6 @@ public class Examples {
  }
 }
 \end{lstlisting}
-\section{Direct Initialization}
-
-\subsection{Object Initializers}
-Object Initialisierer erlaubt das Instanzieren und Initialisieren einer Klasse in einem einzigen Statement. Die Objekte lassen sich auch erzeugen, wenn kein passender Konstruktor zur Verfügung steht.
-\begin{lstlisting}
-	Student s1 = new Student("John") {
-		Id = 2009001,
-		Subject = "Computing"
-	};
-	Student s2 = new Student {
-		Name = "Ann",
-		Id = 2009002,
-		Subject = "Mathematics"
-	};
-	
-	// Object Initializers zusammen mit Lamdas
-	int[] ids = { 2009001, 2009002, 2009003 };
-	IEnumerable<Student> students = ids.Select(n => new Student { Id = n });
-\end{lstlisting}
-
-\subsection{Collection Initializers}
-Ist das selbe wie Objekte Initializers, jedoch mit Listen.
-\begin{lstlisting}
-	List<int> l1 = new List<int> { 1, 2, 3, 4 };
-	Dictionary<int, string> d1 = new Dictionary<int, string>
-	{
-		{ 1, "a" },
-		{ 2, "b" },
-		{ 3, "c" }
-	};
-	d1 = new Dictionary<int, string> {
-		[1] = "a",
-		[2] = "b",
-		[3] = "c"
-	};
-	
-	object s = new Dictionary<int, Student>
-	{
-		{ 2009001, new Student("John") {
-				Id = 2009001,
-				Subject = "Computing" } },
-		{ 2009002, new Student {
-				Name = "Ann", Id = 2009002,
-				Subject = "Mathematics" } }
-	};
-\end{lstlisting}
-\subsection{Kombination aus Object und Collection Initializers}
-//Kombination Object und Collection Initializers
-\begin{lstlisting}
-object s = new Dictionary < int, Student >
-{
-  {
-       2009001,
-       new Student("John") {
-        Id = 2009001, Subject = "Computing"
-       }
-  },
-  {
-      2009002,
-      new Student {
-        Name = "Ann", Id = 2009002, Subject = "Mathematics"
-      }
-  }
-};
-\end{lstlisting}
-
-\subsection{VAR: Anonymous Types}
-\begin{itemize}
-	\item Mit dem Schlüsselwort \lstinline|var| wird der Typ vom Compiler herausgefunden
-	\item \lstinline|var| kann nur für lokale Variablen verwendet werden. Der Einsatz bei Parametern, Klassenvariablem und Properties ist nicht erlaubt.
-	\item Der Typ wird aus der Zuweisung abgeleitet, wobei die Variable zu 100\% typensicher bleibt.
-	\item Wird meistens in LINQ Queries verwendet (um Zwischenresultate zu speichern)
-	\item \textbf{Wichtig:} Properties von Anonymen Typen sind immer readonly.
-\end{itemize}
-
-\begin{lstlisting}
-class Student {
- public string Name;
- public int Id;
- public string Subject {
-  get;
-  set;
- }
- public Student() {}
- public Student(string name) {
-  Name = name;
- }
-}
-public class Examples {
- public void Test() {
-  var a = new {
-   Id = 1, Name = "John"
-  };
-  var b = new {
-   a.Id, a.Name
-  };
-  var studentList = new List < Student > ();
-  var q = studentList.GroupBy(s => s.Subject).Select(grp => new {
-   Subject = grp.Key, Count = grp.Count()
-  });
- }
-}
-\end{lstlisting}
 \section{Tasks}
 Ein Task ist eine leichtgewichtige Variante eines Threads und repräsentiert eine asynchrone Operation. Synchrone Waits sind \textbf{gefährlich} und \textbf{blockieren} den aktuellen Thread! Beispielsweise kann ein Download den ganzen Thread für eine bestimmte Zeit blockieren. Besser mit  \lstinline|async|/ \lstinline|await| arbeiten.
 \begin{lstlisting}
@@ -3316,7 +3316,7 @@ Task task = Task
 \begin{itemize}
 	\item Ruft eine Methode auf ohne auf das Resultat zu warten
 	\item Möglichkeit zur Benachrichtigung bei Fertigstellung (Callback)
-	\item Oder: Rückgabe eines "Task" Objektes auf welchem Status abgefragt werden kann
+	\item Oder: Rückgabe eines \lstinline|Task| Objektes auf welchem Status abgefragt werden kann
 \end{itemize}
 \subsection{async / await}
 \paragraph{async}
@@ -3325,14 +3325,14 @@ Task task = Task
 	\item Einschränkung Rückgabewert
 	      \begin{itemize}
 		      \item Task (Task ohneRückgabewert)
-		      \item Task<T> (Task mitRückgabewertT)
+		      \item Task<T> (Task mit Rückgabewert T)
 		      \item void (Fire and forget, i.d.R nicht verwendet)
 	      \end{itemize}
 \end{itemize}
 \paragraph{await}
 \begin{itemize}
-	\item Alles nach "await" ist wird vom Compiler zu einer "Continuation" umgewandelt (es wird also nicht blockiert)
-	\item Nur in "async" Methoden erlaubt
+	\item Alles nach 'await' ist wird vom Compiler zu einer 'Continuation' umgewandelt (es wird also nicht blockiert)
+	\item Nur in 'async' Methoden erlaubt
 \end{itemize}
 \clearpage
 \paragraph{Beispiel / Download Content mit await} \hfill
@@ -3354,6 +3354,62 @@ Task task = Task
 	\item[-] Await nicht erlaub in lock-Statements
 \end{itemize}
 
+\subsection{Cancellation}
+Integriertes Programmiermodell für das Abbrechen von Programmlogik, z.B. Abbruch einer langlaufenden Datenbankoperation, wenn API-Call abgebrochen wurde oder ein Abbruch durch 'CTRL+C'.
+
+Nutzt die Klasse \lstinline|CancellationToken|. Muss durch die gesamte Aufrufkette durchgereicht werden. Dies als letzter Parameter jeder asynchroner Methode (Best Practices).
+
+\begin{lstlisting}
+static void ManualCancellation(
+	CancellationToken cancellationToken)
+	{
+	for (int i = 0; i < 100_000; i++)
+	{
+		// Do some work...
+
+		// Variante A
+		if (cancellationToken.IsCancellationRequested) { /* ... */ }
+
+		// Variante B
+		cancellationToken.ThrowIfCancellationRequested();
+	}
+}
+\end{lstlisting}
+
+\subsubsection{Cancellation Token Source}
+Klasse zur Erstellung und Steuerung von CancellationTokens. Kann beliebig viele Tokens emittieren.
+\begin{lstlisting}
+CancellationTokenSource cts = new();
+CancellationToken ct = cts.Token;
+
+Task t1 = LongRunning(1_000, ct); // 1s tied to CTS
+Task t2 = LongRunning(3_000, ct); // 3s tied to CTS
+Task t3 = LongRunning(3_500, default); // 3s independent/not cancellable
+
+await Task.Delay(2_000, ct);
+
+Console.WriteLine("Cancelling");
+cts.Cancel();
+Console.WriteLine("Canceled");
+
+async Task LongRunning(int ms, CancellationToken ct)
+{
+	Console.WriteLine($"{ms}ms Task started.");
+	await Task.Delay(ms, ct);
+	Console.WriteLine($"{ms}ms Task completed.");
+};
+
+//Console output:
+//-----------------------
+//1000ms Task started.
+//3000ms Task started.
+//3500ms Task started.
+//1000ms Task completed.
+//Cancelling
+//Canceled
+//3500ms Task completed.
+\end{lstlisting}
+
 \section{Entity Framework}
 Entity Framework Core /EF Core ist ein O/R Mapping Framework und verbindet Objekt-Orientiertes (Domain Model) mit Relationalem (Relational Model). Man unterscheidet zwischen zwei Varianten wie die Entitätsklassen/Datenbanken erstellt werden könnnen.
 \paragraph{Basis-Funktionalitäten} Mapping von Entitäten, CRUD Operationen, Key-Generierung, Caching, Change Tracking, Optimistic Concurrency, Transactions, CLI
@@ -3366,7 +3422,7 @@ Entity Framework Core /EF Core ist ein O/R Mapping Framework und verbindet Objek
 \subsection{OR Mapping}
 Ein OR-Mapper (Mapping) stellt die Verbindung zwischen Datenbank (Storage Entity) und Klassen (Entity Type) her. Er verbindet die Object ID mit dem Primary Key und bildet auch komplexer gebilde, wie z.B Vererbung ab. Beim Code First Ansatz \textbf{muss ein Member Id rsp. [ClassName]Id} existieren, damit das Entity Framework über den PrimaryKey bescheid weiss.
 \begin{description}
-	\item[Providers] Diverse relationale SQL Providers.
+	\item[Providers] Diverse relationale SQL Providers. (Von NuGet)
 	\item[Entity] Ein Objekt mit einem Key (z.B ID). Mehrere dieser Objekte werden zu einem Entity-Set zusammengefasst.
 	\item[Mapping] Mapping der Klassen auf das darunter liegende Speichermodell.
 	\item[Mappingansätze] \textbf{By Convention}, \textbf{By Attributes}, \textbf{By Fluent API} . Zuordnung von Entity Type zu Storage Entity, Property zu Column, Entity Key zu Primary Key, Foreign Key zu Relationship.
@@ -3492,6 +3548,20 @@ Convention: Keine Restriktion / z.b. NVARCHAR(MAX), 450 Zeichen bei Keys
 [MaxLength(500)]                                         // Data Annotations
 \end{lstlisting}
 
+\paragraph{Unicode}
+Convention: Strings sind immer Unicode (NVARCHAR)
+\begin{lstlisting}
+.Property(e => e.Name).isUnicode(false)                 // Fluent API
+[Unicode(false)]                                        // Data Annotations
+\end{lstlisting}
+
+\paragraph{Precision}
+Convention: Pro Datentyp im Provider festgelegt, Precision: Genauigkeit / Anzahl digits total, Scale: Anzahl Nachkommastellen
+\begin{lstlisting}
+.Property(e => e.Name).HasPrecision(10, 2)               // Fluent API
+[Precision(10, 2)]                                        // Data Annotations
+\end{lstlisting}
+
 \paragraph{Indexes}
 Convention: Werden bei Foreign Keys automatisch erstellt
 \begin{lstlisting} 
@@ -3502,12 +3572,17 @@ modelBuilder.Entity<Category>()                         // Fluent API - Unique I
     .IsUnique();
 modelBuilder.Entity<Category>()                         // Fluent API - Multi-column Index
     .HasIndex(b => new { b.Name, b.IsActive });
-// Data Annotations - nicht unterstuetzt
+
+[Index(nameof(Name))]                                  // Data Annotations - Non-unique Index
+[Index(nameof(Name), IsUnique = true)]                 // Data Annotations - Unique Index
+[Index(nameof(Name), nameof(IsActive))]                // Data Annotations - Multi-column Index
 \end{lstlisting}
 
 \subsubsection{Relationale DB (SQL Server)}
 \paragraph{Tabellen} Convention: Tabellenname = Klassenname (Pluralized) (z.b. dbo.Categories)
 \begin{lstlisting}
+// Convention
+public DbSet<Category> Categories { get; set; }
 // Fluent API - Name zwingend, Schema optional
 modelBuilder.Entity<Category>()                         
     .ToTable("Category", schema: "dbo");
@@ -3517,7 +3592,7 @@ public class Category {...}
 \end{lstlisting}
 
 \paragraph{Spalten}
-Convention: Spaltenname = Property-Name
+Convention: Spaltenname = Property-Name, Beispiel: Name
 \begin{lstlisting}
 // Fluent API
 modelBuilder.Entity<Category>()                         
@@ -3551,6 +3626,11 @@ modelBuilder.Entity<Product>()
     .WithMany(b => b.Products)
     .HasForeignKey(p => p.CategoryId)
     .HasConstraintName("FK_Product_CategoryId");
+
+public class Category {
+    public int Id { get; set; }
+    public ICollection<Product> Products { get; set; }
+}
 public class Product {
     public int Id { get; set; }
     public int CategoryId { get; set; }
@@ -3558,13 +3638,9 @@ public class Product {
     [ForeignKey(nameof(CategoryId))]                        
     public Category Category { get; set; }
 }
-public class Category {
-    public int Id { get; set; }
-    public ICollection<Product> Products { get; set; }
-}
 \end{lstlisting}
 
-\paragraph{Relationship / Association – One-to-Many / No Foreign Key Property}
+\paragraph{Relationship / Association – One-to-Many / No Foreign Key Property (Shadow)}
 Convention: Collection Navigation Property (1-Ende), Reference Navigation Property (N-Ende)
 \begin{lstlisting}
 // Fluent API - .HasForeignKey weglassen
@@ -3572,14 +3648,15 @@ modelBuilder.Entity<Product>()
     .HasOne(p => p.Category)
     .WithMany(b => b.Products)                          
     .HasConstraintName("FK_Product_CategoryId");
+
+public class Category {
+		public int Id { get; set; }
+		public ICollection<Product> Products { get; set; }
+}
 public class Product {
     public int Id { get; set; }
     //Data-Annotation - Foreign Key weglassen
     public Category Category { get; set; }              
-}
-public class Category {
-    public int Id { get; set; }
-    public ICollection<Product> Products { get; set; }
 }
 \end{lstlisting}
 
@@ -3590,21 +3667,100 @@ modelBuilder.Entity<Product>()
     .HasOne<Category>()
     .WithMany(b => b.Products)
     .HasConstraintName("FK_Product_CategoryId");
-public class Product {
-    //Data Annotations - Foreign Key + Navigation Property weglassen
-    public int Id { get; set; }                         
-}
+
 public class Category {
     public int Id { get; set; }
     public ICollection<Product> Products { get; set; }
 }
+public class Product {
+    //Data Annotations - Foreign Key + Navigation Property weglassen
+    public int Id { get; set; }                         
+}
 \end{lstlisting}
 
-\paragraph{Relationship / Association - One-to-one / Many-to-many} One-to-one + Many-to-many
+\paragraph{Relationship / Association – One-to-Many / Foreign Key} Convention: Foreign Key Property
+\begin{lstlisting}
+//Fluent API - .HasOne ist anders
+modelBuilder.Entity<Product>()
+    .HasOne<Category>()
+    .WithMany()
+    .HasForeignKey(p => p.CategoryId)
+    .HasConstraintName("FK_Product_CategoryId");
 
-\textbf{One-to-one:} Nur Reference Navigation Property, keine Collection Navigation Property, \lstinline|.HasOne(...).WithOne(...)|
+public class Category {
+    public int Id { get; set; }
+}
+public class Product {
+    //Data Annotations - Foreign Key + Navigation Property weglassen
+    public int Id { get; set; }
+	public int CategoryId { get; set; }
+}
+\end{lstlisting}
 
-\textbf{Many-to-many:} aktuell nicht unterstützt, work-around (Assoziations-Klasse, zwei One-to-many Relationships)
+\paragraph{Relationship / Association - One-to-one }
+Nur Reference Navigation Property, keine Collection Navigation Property, \lstinline|.HasOne(...).WithOne(...)|
+
+\paragraph{Relationship / Many-to-Many / Ohne Join Entity Type}
+Convention: Wird automatisch erkannt. Mapping-Tabelle wird automatisch generiert
+Data Annotations: Wird nicht unterstützt
+\begin{lstlisting}
+// Fluent API - HasMany/WithMany. Ausgehend von Category oder Product 
+modelBuilder.Entity<Category>()
+    .HasMany(p => p.Products)
+    .WithMany(b => b.Categories);
+
+public class Category {
+    public int Id { get; set; }
+    public ICollection<Product> Products { get; set; }
+}
+public class Product {
+    public int Id { get; set; }
+    public Icollection<Category> Categories{ get; set; }
+}
+\end{lstlisting}
+
+\paragraph{Relationship / Many-to-Many / Mit Join Entity Type}
+Convention / Data Annotations: Wird nicht unterstützt
+\begin{lstlisting}
+// Fluent API - HasMany/WithMany. Ausgehend von Category oder Product 
+modelBuilder.Entity<Category>()
+    .HasMany(c => c.Products)
+    .WithMany(p => p.Categories)
+    .UsingEntity<ProductCategory>(
+        // Right part - ProductCategory > Product
+        pc => pc
+            .HasOne(e => e.Product)
+            .WithMany(e => e.ProductCategories)
+            .HasForeignKey(e => e.ProductId), // Optional
+        // Left part - ProductCategory > Category
+        pc => pc
+            .HasOne(e => e.Category)
+            .WithMany(e => e.ProductCategories)
+            .HasForeignKey(e => e.CategoryId) // Optional
+    );
+
+public class Category
+{
+    public int Id { get; set; }
+    public ICollection<Product> Products { get; set; }
+    public ICollection<ProductCategory> ProductCategories { get; set; }
+}
+public class Product
+{
+    public int Id { get; set; }
+    public ICollection<Category> Categories { get; set; }
+    public ICollection<ProductCategory> ProductCategories { get; set; }
+}
+public class ProductCategory
+{
+    public int ProductId { get; set; } // Optional
+    public Product Product { get; set; }
+    public int CategoryId { get; set; } // Optional
+    public Category Category { get; set; }
+    // Payload Property
+    public bool IsDeleted { get; set; } = false;
+}
+\end{lstlisting}
 
 \subsection{Database Context}
 \subsubsection{Klasse ''DbContext''}
@@ -3645,7 +3801,7 @@ using (ShopContext context = new ShopContext()) {
 
 \paragraph{Query Execution with JOIN}
 LINQ Query Syntax für Entity Framework:
-Entitiy Framework führt keine Queries aus sondern generiert sie nur. Datenbank führt sie dann aus.
+Entitiy Framework führt keine Queries aus sondern generiert sie nur. Datenbank führt sie dann aus. Nicht alle .NET-Expressions können auf Datenbanksyntax übersetzt werden. Vorallem solche mit eigenen Funktionen sind problematisch. Der Generierte SQL Output ist je nach Formulierung anderst (Manchmal optimal, manchmal weniger.) Kann von Version zu Version ändern.
 \begin{lstlisting}
 //LINQ to Entities                                  Executed T-SQL Statement
 var query =                                         SELECT
@@ -3800,7 +3956,7 @@ context.SaveChanges();                                              // EntitySta
 \end{lstlisting}
 
 \subsection{Lazy-, Eager-Loading}
-Es wird standardmässig Lazy Loading verwendet.
+Es wird standardmässig Eager Loading verwendet.
 \begin{description}
 	\item[Lazy Loading] Assoziationen werden per se nicht geladen werden aber bei Zugriff auf Property automatisch nachgeladen. Collections werden komplett geladen. Passiert in separater Abfrage.
 		Daten werden erst geladen, wenn sie referenziert werden. z.B erst wenn effektiv auf die Membervariable (Liste aus mehreren Items) zugegriffen wird. Für das Lazy Loading müssen die Methoden \lstinline|virtual| definiert werden.
@@ -3809,7 +3965,7 @@ Es wird standardmässig Lazy Loading verwendet.
 		Even with lazy loading disabled it is still possible to lazily load related entities, but it must be done with an explicit call. To do so you use the Load method on the related entity’s entry
 \end{description}
 \begin{lstlisting}
-Order order = context.Orders.First();
+Order order = await context.Orders.FirstAsync();
 var customer = order.Customer; //customer is ''null''
 var items = order.Items; //items is ''null''
 \end{lstlisting}
@@ -3825,36 +3981,36 @@ public class Order {
 public class OrderProxy : Order {
     public virtual Customer Customer { /* ??? */ }      // virtual wichtig
 }
-Order order = context
+Order order = await context
     .Orders
-    .First();
+    .FirstAsync();
 \end{lstlisting}
 
 \begin{lstlisting}
 // eager loading - mit .Include wird definiert was alles zusaetzlich ins RAM geladen werden soll
-Order order = context
+Order order = await context
     .Orders
     .Include(o => o.Customer)                           // Eager Loading
     .Include(o => o.Items)
         .ThenInclude(oi => oi.Product)                  // Cascaded eager loading
-    .First();
+    .FirstAsync();
 \end{lstlisting}
 
 \begin{lstlisting}
-// explicit loading - .Load() fuehrt dazu dass die Daten nachgeladen und in den Parent geladen werden D.h. es wird eine neue Query an die DB gemacht.
-Order order = context
+// explicit loading - .LoadAsync() fuehrt dazu dass die Daten nachgeladen und in den Parent geladen werden D.h. es wird eine neue Query an die DB gemacht.
+Order order = await context
     .Orders
-    .First();
-context
+    .FirstAsync();
+await context
     .Entry(order)
     .Reference(o => o.Customer)                         // Parents
-    .Load();
-context
+    .LoadAsync();
+await context
     .Entry(order)
     .Collection(o => o.Items)                           // Collections
     .Query()
-    .Where(oi => oi.QuantityOrdered > 1)
-    .Load();
+    .Where(oi => oi.QuantityOrdered > 1)                // Filter
+    .LoadAsync();
 \end{lstlisting}
 
 \subsection{Optimistic Concurrency}
@@ -3924,6 +4080,7 @@ try {
 DbUpdateConcurrencyException beinhaltet fehlerhafte ''Entries'' (Aktuelle Werte, Originale Werte, Datenbank Werte). \textbf{Standardverfahren:} 1. Ignorieren, 2. Benutzer fragen, 3. Autokorrektur.
 
 \begin{lstlisting}
+try { /* ... */}
 catch (DbUpdateConcurrencyException ex) {
     foreach (var entry in ex.Entries) {
         if (entry.Entity is Product) {
@@ -4018,2162 +4175,6 @@ using(var context = new AngProjContext()) {
 	\label{fig:datatypemappings}
 \end{figure}
 
-
-% TODO Entity
-% \section{Entity Framework}
-% Unter .NET kommt ADO.NET als Entity Framework zum Einsatz. Man unterscheidet zwischen zwei Varianten wie die Entitätsklassen/Datenbanken erstellt werden könnnen. Das Entity Framework muss mit NuGet installiert werden.
-% \begin{description}
-% 	\item[Designer Centric] Man erstellt zuerst ein Domain Model und generiert daraus die Klassen. Man kann das Model auch von einer existierenden Datenbank ableiten und dann wieder die Klassen daraus generieren
-% 	\item[Code Centric] Man erstellt die Model Klassen und lässt die Datenbank automatisch generieren.
-% \end{description}
-
-% \begin{lstlisting}	
-% // models
-% public class Blog
-% {
-% 	public int BlogId { get; set; }
-% 	public string Name { get; set; }
-% 	public string Url { get; set; }
-% 	// Navigation Property
-% 	public virtual ICollection<Post> Posts { get; set; } = new HashSet<Post>();
-% }
-
-% // Datenkonsistenz wird von der Businessklasse selbstaendig sichergestellt
-% public class Post {
-% 	public Blog blog {get; set; }
-% }
-
-% \end{lstlisting}
-
-% \begin{lstlisting}	
-% // define DB context
-% public class BlogDB : DbContext
-% {
-% 	public BlogDB() : base("name=ErstesBeispiel"){
-
-% 		// CreateDatabaseIfNotExists (default)
-% 		// DropCreateDatabaseIfModelChanges
-% 		// DropCreateDatabaseAlways
-% 		// MigrateDatabaseToLatestVersion
-% 		Database.SetInitializer<BlogDB>(new DropCreateDatabaseAlways<DbContext>());
-% 	}
-
-% 	public virtual DbSet<Blog> Blogs { get; set; }
-% 	public virtual DbSet<Post> Posts { get; set; }
-% }
-
-% \end{lstlisting}
-
-% \begin{lstlisting}
-% // use
-% using (var db = new BlogDB()) {
-% 	//create blog and posts
-% 	var newBlog = new Blog { Name = "FirstBlog" };
-% 	db.Blogs.Add(newBlog);
-% 	newBlog.Posts.Add(new Post() { Title = "Post1" });
-% 	newBlog.Posts.Add(new Post { Title = "Post2" });
-
-% 	//save all changes to the database
-% 	db.SaveChanges();
-
-% 	// Display all Blogs from the database 
-% 	var query = from blog in db.Blogs
-% 		orderby blog.Name
-% 		select new { blog.Name, NrPosts = blog.Posts.Count };
-
-% 	Console.WriteLine("All blogs in the database:");
-% 	foreach (var item in query) {
-% 		Console.WriteLine("{0} : {1}", item.Name, item.NrPosts);
-% 	}
-
-% 	//update post
-% 	var p = (from post in db.Posts select post).FirstOrDefault();
-% 	if (p != null) {
-% 		p.Title = "Modified";
-% 	}
-% 	db.SaveChanges();
-
-% 	//delete blog
-% 	var b = (from blog in db.Blogs select blog).FirstOrDefault();
-% 	if (b != null) {
-% 		db.Blogs.Remove(b);
-% 	}
-
-% 	//Blog is removed from Database, exists as a detachhed POCO
-% 	db.SaveChanges();
-% }
-% \end{lstlisting}
-
-% \begin{lstlisting}[language=XML, caption=app.config]
-% </configuration>
-% 	...
-% 	<connectionStrings>
-% 		<add name="ErstesBeispiel" connectionString="data source=(localdb)\mssqllocaldb;
-% 			initial catalog=ErstesBeispiel;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework"
-% 			providerName="System.Data.SqlClient" />
-% 	</connectionStrings>
-% </configuration>
-% \end{lstlisting}
-
-% \subsection{OR Mapping}
-% Ein O/R Mapping Framework verbindet Objekt-Orientiertes(Domain Model)mit dem relationalem Model(Relational Model). Das heisst, ein OR-Mapper stellt die Verbindung zwischen Datenbank und Klassen her. Er verbindet die Object ID mit dem Primary Key und bildet auch komplexer gebilde, wie z.B Vererbung ab. Beim Code First Ansatz \textbf{muss ein Member Id rsp. [ClassName]Id} existieren, damit das Entity Framework über den PrimaryKey bescheid weiss.
-% Grundsätzlich ist es immer gleich aufgebaut, man hat folgende Elemente:
-% \begin{enumerate}
-%     \item Entity Type
-%     \begin{itemize}
-%         \item Domain Modell (Normale .NET Klassen)
-%         \item Inhalt:
-%         \begin{itemize}
-%             \item Properties
-%             \item Entity Keys
-%             \item Foreign Keys
-%             \item Relationships / Associations
-%             \item Alternate Keys
-%         \end{itemize}
-%     \end{itemize}
-%     \item Mapping
-%     \begin{itemize}
-%         \item Mapping der Klassen auf das darunterliegende Speichermodell.
-%         \item Zuordnung
-%         \begin{itemize}
-%             \item Entity Type zu Storage Entity
-%             \item Property zu Column
-%             \item Entity Key zu PK
-%             \item u.v.m
-%         \end{itemize}
-%         \item Ansätze:
-%         \begin{itemize}
-%             \item By Convention 
-%             \item By Attributes
-%             \item By Fluent API
-%         \end{itemize}
-%     \end{itemize}
-%     \item Storage Entity
-%     \begin{itemize}
-%         \item Relationales Modell (DB)- abhängig vom Provider
-%     \end{itemize}
-% \end{enumerate}
-% Darüberhinaus sind folgende Begriffe wichtig:
-% \begin{description}
-% 	\item[Entity] Ein strukturierter Datensatz mit einem Key (z.B ID) (Instanz eines Entity-Type)
-% 	\item[Association] Definiert eine Assotiation zwischen Entitäten (z.B Navigation Properties, Foreign Keys)
-% \end{description}
-
-
-
-% \subsubsection{Vererbung Mappings}
-% Es gibt drei Varianten wie Vererbungen in der Datenbank abgebildet werden könnnen
-% \begin{itemize}
-% 	\item \textbf{Table per Hierarchy}: Der Standard. Alles in eine Tabelle
-% 	\begin{lstlisting}
-% 	// Discriminator = ClassName
-% 	modelBuilder.Entity<Dog>().HasBaseType<Animal>();
-
-% 	// Discriminator = custom
-% 	modelBuilder.Entity<Animal>().HasDiscriminator<int>("AnimalType")
-% 	  .HasValue<Dog>(0).HasValue<Cat>(1).HasValue<Pig>(2);
-% 	\end{lstlisting}
-% 	Diskriminator nötig.
-% 	\item \textbf{Table per concrete Type}: Tabelle für Parent und Tabelle für Childs inkl. Felder des Parents -> \textbf{nicht umgesetzt in EF}
-% 	\item \textbf{Table per Type}: Tabelle für Parent und Tabellen für Childs mit Verweis auf Parent. Child Tabelle enthält nur die ergänzenden Felder. Parent und Child enthalten Id, über die gelinkt wird. -> \textbf{nicht umgesetzt in EF}
-% \end{itemize}
-
-
-% \textbf{Table Splitting:}\newline
-% Zwei Entitäten werden in einer Tabelle gespeichert. Spalten werden verteilt:
-% \begin{lstlisting}
-% modelBuilder.Entity<OrderDetail>(e => { 
-%     e.ToTable("Orders"); 
-%     /* Map Props */ 
-% });
-% modelBuilder.Entity<Order>(e => { 
-%     e.ToTable("Orders"); 
-%     /* Map Props */ 
-%     e.HasOne(o => o.Details)
-%       .WithOne()
-%       .HasForeignKey<OrderDetail>(=> o.Id);
-% });
-% \end{lstlisting}
-
-% \subsection{Migrations}
-% .NET CLI: "dotnet ef migrations add AddOrder"
-% \newline
-% -> 20000101000000\_AddOrder.cs\newline
-% -> 20000101000000\_AddOrder.Designer.cs\newline 
-% \textbf{erstellt.}
-
-% \begin{lstlisting}
-% using(var ctx = new NorthwindContext()) {
-%     var db = ctx.Database;
-
-%     // Dev loeschen und neu erstellen
-%     db.EnsureDeleted();
-%     db.EnsureCreated();
-
-%     // Auto Migration auf neusten Stand
-%     db.Migrate();
-
-%     // Migrations abfragen
-%     IEnumerable<string> migrations;
-%     migrations = db.GetMigrations();
-%     migrations = db.GetPendingMigrations();
-%     migrations = db.GetAppliedMigrations();
-
-%     // Explizite Migration auf bestimmte Version
-%     var m = ctx.GetService<IMigrator>();
-%     m.Migrate("<MigrationName>");
-% }
-% \end{lstlisting}
-
-% \subsection{Database First}
-% Beim Database First Ansatz wird die Datenbank aus einem *.edmx Model heraus generiert .Das Model besteht aus drei Teilen:
-% \begin{figure}[ht]
-% 	\centering
-% 	\includegraphics[width=0.7\linewidth]{images/entity_data_model}
-% 	\caption{Entity Data Model}
-% 	\label{fig:entitydatamodel}
-% \end{figure}
-% \begin{description}
-% 	\item[SSDL: Store Schema Definition Language] \hfill \\
-% 	Definiert die Struktur des Datenspeichers (z.B. SQL Server Datenbank). Beinhaltet Entities (Tabellen, View), Properties(Spalten), Keys (Primarykeys), Associations (Fremdschlüssel, Beziehungen), Functions (Stored Procedures, Stored Functions). 
-% 	\item[CSDL: Conceptual Schema Definition Language] \hfill \\
-% 	Definiert das konzeptuelle Modell und beinhaltet Entitäten, Properties / Fields, Beziehungen und Funktionen. 
-% 	\item[MSL: Mapping Specification Language] \hfill \\ 
-% 	Mapping zwischen den Artefakten in SSDL und CSDL.  
-% \end{description}
-
-% \subsection{Code First}
-% \subsubsection{Attribute}
-% \begin{lstlisting}
-% [Table("orders")]
-% class Order {
-
-% 	// implizit the Id oder [ClassName]Id is primary key
-% 	// By convention mapped to col PK_<ClassName> (with relational provider)
-% 	[Key]
-% 	[Column("id")]
-% 	public Guid Id { get; set; }
-
-% 	[Column("customer")]
-% 	public Guid CustomerId { get; set; }
-
-% 	[Column("productName"), Required, StringLength(50)] // oder [MaxLength(500)]
-% 	public string Name { get; set; }
-
-% 	// implizit the Id oder [ClassName]Id is foreign key
-% 	[ForeignKey("CustomerId"), InverseProperty("Orders")]
-% 	public Customer Customer { get; set; }
-
-% 	// Deklariert das andere Ende der Relation
-% 	[InverseProperty("Products")]
-% 	public decimal Price { get; set; }
-
-% 	[NotMapped]
-% 	public decimal PriceTotal {
-% 		get { return this.Items.Sum(x => x.Subtotal); }
-% 	}
-% }
-% \end{lstlisting}
-
-% \subsection{Model Builder: Fluent API (- viel Text, unstrukturiert)}
-% Mit dem Model Builder kann deklartiv festgelegt werden, wie das Model generiert werden soll. Das Resultat ist das selbe wie mit der Attribut Variante. 
-% \begin{lstlisting}
-% protected override void OnModelCreating(DbModelBuilder modelBuilder) {
-% 	base.OnModelCreating(modelBuilder);
-
-% 	var product = modelBuilder.Entity<Product>();
-% 	product.ToTable("products");
-% 	product.HasKey(x => x.Id); // HasKey(x => x.Id).IsRequired();
-% 	// Mapping for Relational provider:
-% 	//   product.HasKey(x => x.Id).HasName("PK_Product")
-% 	product.Property(x => x.Id).HasColumnName("id");
-
-% 	// Computed Column:
-% 	product.Property(x => x.DisplayName)
-% 	  .HasName("[Id] + ' ' + [Name]");
-% 	// A computed column is a column whose value is calculated in the database. A computed column can use other columns in the table to calculate its value.
-
-% 	// Fluent API = einzige Moeglichkeit für Composite Keys!
-
-% 	var order = modelBuilder.Entity<Order>();
-% 	order.Ignore(o => b.PriceTotal); // Ignore via Fluent API ([NotMapped])
-% 	order.Property(o => o.Name).HasMaxLength(500); // <=> [MaxLength(500)]
-% }
-
-% // oder Entity Type Configuration pro Entity
-
-% internal class ProductTypeConfig : IEntityTypeConfiguration<Product> {
-%     public void Configure(EntityTypeBuilder<Product> builder) {
-%       builder.Property(p => p.Timestamp)
-%         .IsRowVersion();
-%     }
-% }
-
-% ...
-% protected override void OnModelCreating(DbModelBuilder modelBuilder) {
-%     modelBuilder.ApplyConfiguration(new ProductTypeConfig());
-% }
-% ...
-% \end{lstlisting}
-
-% \subsection{Indexes}
-% \subsubsection{Convention}
-% Werden bei Foreign Keys automatisch erstellt.
-
-% \subsubsection{Fluent API}
-% \begin{lstlisting}
-% protected override void OnModelCreating(DbModelBuilder modelBuilder) {
-% 	base.OnModelCreating(modelBuilder);
-% 	...
-% 	var product = modelBuilder.Entity<Product>();
-% 	product.HasIndex(p => p.Name); // Non-unique index
-
-% 	// vs Unique index:
-% 	var product = modelBuilder.Entity<Product>();
-% 	product.HasIndex(p => p.Name).IsUnique(); // Unique index
-
-% 	// vs Multi column index
-% 	var product = modelBuilder.Entity<Product>();
-% 	product.HasIndex(p => new { p.Name, b.Price });
-% }
-% \end{lstlisting}
-
-% \subsubsection{Data Annotations}
-% Unterstützen Indexes nicht.
-
-% \subsection{Providerabhängige Möglichkeiten: Relationale Provider, z.B. MS SQL Server}
-% \textbf{Microsoft.EntityFrameworkCore.Relational} Package für Model-Builder/Fluent API
-
-% \subsubsection{Convention}
-% \textbf{Tabellen}\newline
-% Tabellenname = Klassenname (Pluralized): z.B. dbo.Products
-
-% ~\newline
-% \textbf{Spalten und ihre Typen}\newline
-% Spaltenname = Property-Name: z.B. Name\newline
-% Typ = Data type mappings
-
-% \subsubsection{Fluent API}
-% \textbf{Tabellen}\newline
-% \begin{lstlisting}
-% ...
-% protected override void OnModelCreating(ModelBuilder modelBuilder) {
-%     // schema = optional
-%     modelBuilder.Entity<Product>().ToTable("Product", schema: "dbo");
-% }
-% ...
-% \end{lstlisting}
-% \newline
-
-% \textbf{Spalten und ihre Typen}\newline
-% \begin{lstlisting}
-% modelBuilder.Entity<Product>()
-%   .Property(p => p.Name)
-%   .HasColumnName("ProductName", order: 1) // order is optional
-%   .HasColumType("NVARCHAR(500)")¨
-%   .HasDefaultValue("------");
-% \end{lstlisting}
-% \newline
-
-% \subsubsection{Data Annotations}
-% \textbf{Tabellen}\newline
-% \begin{lstlisting}
-% [Table("Product", Schema = "dbo")] // Schema optional
-% public class Product
-% {
-%     public int Id { get; set; }
-% }
-% \end{lstlisting}
-% \newline
-
-% \textbf{Spalten und ihre Typen}\newline
-% Default Values nicht unterstützt 
-% \begin{lstlisting}
-% [Table("Product", Schema = "dbo")] // Schame optional
-% public class Product
-% {
-%     public int Id { get; set; }
-%     [Column("ProductName", Order = 1, TypeName = "NVARCHAR(500)")] // Order is opt.
-%     public String Name { get; set; }
-% }
-% \end{lstlisting}
-
-% \subsection{Relationships}
-
-% \subsubsection{Convention}
-% \textbf{One-to-Many: Full defined relationship}\newline
-% \begin{lstlisting}
-% public class Order {
-%     public int Id { get; set; }
-%     public ICollection<OrderItem> OrderItems { get; set; } // 1-Ende: Collection Navigation Property
-% }
-% public class OrderItem {
-%     public int Id { get; set; }
-%     public int OrderId { get; set; } // Foreign Key Property
-%     public Order Order { get; set; } // N-Ende: Reference Navigation Property
-% }
-% \end{lstlisting}
-% \newline\textbf{One-to-Many: No foreign key Property}\newline
-% \begin{lstlisting}
-% public class Order {
-%     public int Id { get; set; }
-%     public ICollection<OrderItem> OrderItems { get; set; } // 1-Ende: Collection Navigation Property
-% }
-% public class OrderItem {
-%     public int Id { get; set; }
-%     // No Foreign Key Property (int OrderId)
-%     public Order Order { get; set; } // N-Ende: Reference Navigation Property
-% }
-% \end{lstlisting}
-
-% \newline\textbf{One-to-Many: Single Navigation Property}\newline
-% \begin{lstlisting}
-% public class Order {
-%     public int Id { get; set; }
-%     public ICollection<OrderItem> OrderItems { get; set; } // 1-Ende: Collection Navigation Property
-% }
-% public class OrderItem {
-%     public int Id { get; set; }
-% }
-% \end{lstlisting}
-
-% \newline\textbf{One-to-Many: Foreign key}\newline
-% \begin{lstlisting}
-% public class Order {
-%     public int Id { get; set; }
-% }
-% public class OrderItem {
-%     public int Id { get; set; }
-%     public int OrderId { get; set; }
-% }
-% \end{lstlisting}
-
-% \subsubsection{Fluent}
-% \textbf{One-to-Many: Full defined relationship}\newline
-% \begin{lstlisting}
-% ...
-%     modelBuilder.Entity<OrderItem>()
-%       .HasOne(oi => oi.Order) // HasOne.WithMany OR HasMany.WithOne
-%       .WithMany(o => o.Orders)
-%       .HasForeignKey(oi => oi.OrderId)
-%       .HasConstraintName("FK_OrderItem_OrderId");
-% ...
-% \end{lstlisting}
-
-% \newline\textbf{One-to-Many: No foreign key Property}\newline
-% \begin{lstlisting}
-% ...
-%     modelBuilder.Entity<OrderItem>()
-%       .HasOne(oi => oi.Order) // HasOne.WithMany OR HasMany.WithOne
-%       .WithMany(o => o.Orders)
-%       // No foreign key Property
-%       .HasConstraintName("FK_OrderItem_OrderId");
-% ...
-% \end{lstlisting}
-
-% \newline\textbf{One-to-Many: Single Navigation Property}\newline
-% \begin{lstlisting}
-% ...
-%     modelBuilder.Entity<OrderItem>()
-%       .HasOne<Order>() // HasOne.WithMany OR HasMany.WithOne
-%       .WithMany(o => o.Orders)
-%       .HasConstraintName("FK_OrderItem_OrderId");
-% ...
-% \end{lstlisting}
-
-% \newline\textbf{One-to-Many: Foreign key}\newline
-% \begin{lstlisting}
-% ...
-%     modelBuilder.Entity<OrderItem>()
-%       .HasOne<Order>() // HasOne.WithMany OR HasMany.WithOne
-%       .WithMany() // <-- !!
-%       .HasForeignKey(oi => oi.OrderId) // !!
-%       .HasConstraintName("FK_OrderItem_OrderId");
-% ...
-% \end{lstlisting}
-
-% \subsubsection{Data Annotations}
-% \textbf{One-to-Many: Full defined relationship}\newline
-% \begin{lstlisting}
-% public class Order {
-%     public int Id { get; set; }
-%     public ICollection<OrderItem> OrderItems { get; set; }
-% }
-% public class OrderItem {
-%     public int Id { get; set; }
-%     public int OrderId { get; set; }
-%     [ForeignKey(nameof(OrderId))]
-%     public Order Order { get; set; } // Auf Nav. Property wird For. Key definiert
-% }
-% \end{lstlisting}
-
-% \newline\textbf{One-to-Many: No foreign key Property}\newline
-% \begin{lstlisting}
-% public class Order {
-%     public int Id { get; set; }
-%     public ICollection<OrderItem> OrderItems { get; set; }
-% }
-% public class OrderItem {
-%     public int Id { get; set; }
-%     public Order Order { get; set; }
-% }
-% \end{lstlisting}
-
-% \newline\textbf{One-to-Many: Single Navigation Property}\newline
-% \begin{lstlisting}
-% public class Order {
-%     public int Id { get; set; }
-%     public ICollection<OrderItem> OrderItems { get; set; }
-% }
-% public class OrderItem {
-%     public int Id { get; set; }
-% }
-% \end{lstlisting}
-
-% \newline\textbf{One-to-Many: Foreign key}\newline
-% \begin{lstlisting}
-% public class Order {
-%     public int Id { get; set; }
-% }
-% public class OrderItem {
-%     public int Id { get; set; }
-%     public int OrderId { get; set; }
-% }
-% \end{lstlisting}
-
-
-% \subsubsection{Allgemein: 1-1 Relationship und Many-Many}
-% \textbf{One-to-one}\newline
-% \begin{itemize}
-%     \item Nur Reference Navigation Property
-%     \item Keine Collection Navigation Property
-%     \item Syntax: .HasOne(...).WithOne(...)
-% \end{itemize}\newline
-% ~\newline
-% \textbf{Many-to-Many}\newline
-% Aktuell nicht unterstützt -> Workaround: Assoziations-Klasse -> 2 One-to-Many Relationships
-
-% \subsubsection{Allgemein: Required/Optional Relationships}
-% \textbf{Required:} Foreign Key NOT NULL\newline
-% .HasOne(...).WithMany(...).IsRequired();\newline
-% ~
-% \newline\textbf{Optional:} Foreign Key NULL\newline
-% .HasOne(...).WithMany(...).IsOptional();
-
-% \subsubsection{Allgemein: Cascade delete}
-% Defaults:
-% \begin{itemize}
-%     \item Required Relationships: Cascade Delete
-%     \item Optional Relationships: Set Foreign key = NULL
-% \end{itemize}
-
-% Definition:
-% \begin{lstlisting}
-% .HasOne(...).WithMany(...).OnDelete(
-%     DeleteBehavior.Cascade
-%     DeleteBehavior.SetNull
-%     DeleteBehavior.Restrict
-%     // more options available...
-% )
-% \end{lstlisting}
-
-% \subsection{Lazy-, Eager-Loading}
-% Man unterscheidet zwischen drei verschiedenen Ladestrategien:
-% \begin{description}
-
-%     \item[EagerLoading (Default)] \\
-%     \begin{itemize}
-%         \item Assoziationen werden nicht geladen
-%         \item \lstinline|Inlcude()|-Statement um einzelne Assoziationen
-%     \end{itemize}
-%     \item [Explicit Loading]\\
-%     \begin{itemize}
-%         \item Assoziationen werden nicht geladen, sondern explizit (in seperaten Abfragen) nachgeladen
-%     \end{itemize}
-%     \item [Lazy Loading]\\
-%     \begin{itemize}
-%         \item  Daten werden erst geladen, wenn sie dereferenziert werden. z.B erst wenn effektiv auf die Membervariable (Liste aus mehreren Items) zugegriffen wird. Für das implizite Lazy Loading müssen die Methoden \lstinline|virtual| definiert werden.
-%     \end{itemize}
-% \end{description}
-
-% Es wird standardmässig Lazy Loading verwendet. 
-% \begin{description}
-% 	\item[Lazy Loading] Daten werden erst geladen, wenn sie dereferenziert werden. z.B erst wenn effektiv auf die Membervariable (Liste aus mehreren Items) zugegriffen wird. Für das implizite Lazy Loading müssen die Methoden \lstinline|virtual| definiert werden. 
-% 	\item[Eager Loading] Das komplette Objekt wird geladen.
-% \end{description}
-
-% \paragraph{Eager Loading} \hfill
-% \newline
-% \begin{lstlisting}
-% Order order = context
-%               .Orders
-%               .First();
-% var customer = order.Customer; // customer is "null"
-% var items = order .Items; // items is "null" 
-
-% //Include um zu laden:
-
-% Order order = context
-%               .Orders.Include(o => o.Customer)
-%               .Include(o => o.Items)
-%               .ThenInclude(oi => oi.Product)
-%               .First();
-% var customer = order.Customer; // customer is not "null" 
-% var items = order.Items; // items is not "null" 
-% \end{lstlisting}
-
-% \paragraph{Explicit Loading} \hfill
-% \newline
-% \begin{lstlisting}
-% Order order = context
-%               .Orders
-%               .First();
-% context.Entry(order)
-% .Reference(o => o.Customer)
-% .Load();
-% context.Entry(order)
-% .Collection(o => o.Items)
-% .Query()
-% .Where(oi => oi.QuantityOrdered > 1)
-% .Load(); 
-% var customer = order.Customer; // customer is not "null" 
-% var items = order.Items; // items is not "null" 
-% \end{lstlisting}
-
-% \paragraph{Lazy Loading} \hfill
-% \newline
-% Bei Lazy Loading gibt es zwei verschiedene Ansätze:
-% \begin{enumerate}
-%     \item Manuell
-%     \item Proxies
-% \end{enumerate}
-% \begin{lstlisting}
-% //manuell
-% public class Order {
-%  private readonly ILazyLoader _lazyLoader;
-%  public Order(ILazyLoader lazyLoader) => _lazyLoader = lazyLoader;
-%  public int Id {
-%   get;
-%   set;
-%  }
-%  public int CustomerId {
-%   get;
-%   set;
-%  }
-%  private Customer _customer;
-%  public Customer Customer {
-%   get => _lazyLoader.Load(this, ref _customer);
-%   set => _customer = value;
-%  }
-%  private ICollection < OrderItem > _items;
-%  public ICollection < OrderItem > Items {
-%   get => _lazyLoader.Load(this, ref _items);
-%   set => _items = value;
-%  }
-% }
-
-% //Proxy, Achtung müssne virtual sein!
-% public class ShopContext: DbContext {
-%  /* ... */
-%  protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-%   optionsBuilder.UseLazyLoadingProxies() /* ... */
-%  }
-% }
-% public class Order {
-%  public int Id {
-%   get;
-%   set;
-%  }
-%  public int CustomerId {
-%   get;
-%   set;
-%  }
-%  public virtual Customer Customer {
-%   get;
-%   set;
-%  }
-%  public virtual ICollection < OrderItem > Items {
-%   get;
-%   set;
-%  }
-% }
-% \end{lstlisting}
-
-% \paragraph{Weitere Beispiele}
-% \begin{lstlisting}
-% // lazy loading
-% // Navigation Props MUESSEN virtual sein, damit Proxy generiert wird von EF!!
-% using (var context = new NorthwindEntities()) {
-% 	context.Configuration.LazyLoadingEnabled = true; //default = true
-% 	var query = from c in context.Customers
-% 					where c.CustomerID == "ALFKI"
-% 					select c;
-% 	var cust = query.FirstOrDefault(); //1. load customer 
-
-% 	if (cust == null) return;
-% 	Console.WriteLine("Customer Id {0}", cust.CustomerID);
-% 	foreach (var order in cust.Orders) { //2. load orders
-% 		Console.WriteLine("	--- Order Id {0}", order.OrderID);
-% 	}
-% }
-
-% // eager loading
-% using (var context = new NorthwindEntities()) {
-% 	var query = from c in context.Customers
-% 					where c.CustomerID == "ALFKI"
-% 					select c;
-% 	var cust = query.Single(); //1. Load customer
-
-% 	//2. Explicitly load Orders
-% 	context.Entry(cust)
-% 			.Collection(c => c.Orders)
-% 			.Load();
-% 	foreach (var order in cust.Orders) { . . . }
-
-% 	context.Entry(order)
-% 	  .Reference(o => o.Owner)
-% 	  .Load();
-
-% 	// Conditional subset loading:
-% 	context.Entry(order)
-% 	  .Collection(o => o.OrderItems)
-% 	  .Query()
-% 	  .Where(oi => oi.Quantity > 3)
-% 	  .Load();
-% }
-
-% using (var context = new NorthwindEntities()) {
-%     Order order = context.Orders.First();
-%     // order.Owner IS NULL
-%     // order.OrderItems IS NULL
-
-%     // ----
-
-%     Order order = context.Orders
-%       .Include(o => o.Owner) // Eager Loading
-%       .Include(o => o.OrderItems) // Eager Loading
-%          ThenInclude(oi => oi.Article) // Cascade Eager Loading: Article within OrderItem
-%       .First();
-
-%       // order.Owner is NOT NULL
-%       // order.OrderItems is NOT NULL
-% }
-% \end{lstlisting}
-
-% \subsection{DB Context}
-% Der DB Context ist für die Persistierung von Objekten zuständig. Es stellt change-Tracking und Caching zur Verfügung und übernimmt das Handling von Entitiy Keys. Im DB Context werden alle CRUD Operationen definiert. Über ihn ist die Methode \lstinline|saveChanges()| verfügbar.
-
-% \begin{itemize}
-%     \item Nicht thread-safe!
-%     \item Nicht zu lange leben (limitierte Anzahl connections im client connection pool)
-%     \item Change tracking wird inperformant, wenn zu viele Entities getrackt werden
-% \end{itemize}
-
-% Kombination von den zwei Patterns ist empfehlenswert:
-% \begin{itemize}
-%     \item Unit of Work¨
-%     \item Repository
-% \end{itemize}
-
-% \textbf{Generell: Eine Instanz pro Unit-of-Work!}
-
-% \subsection{Entity Key (Object Identity)}
-% Der Entity Key ist der Primaryschlüssel/Fremdschlüssel in der objektorientierten Welt. Er ist Initial auf default(T) (meist 0) gesetzt und wird beim ersten Speichern des Objekts in der Datenbank mit dem DB PK überschrieben. Wenn ein Objekt im gleichen Context geladen wird, gibt der Context das gecachte Objekt zurück. Die Objekte werden anhand ihrem Entity Key gecached. 
-
-% \subsection{Optimistic Concurency}
-% Annahme: Beim Speichern wird geprüft, ob der Datensatz zwischenzeitlich geändert wurde.
-% Wenn ein Objekt im gleichen Context geladen wird, gibt der Context das gecachte Objekt zurück.
-% Die Objekte werden anhand ihrem Entity Key gecached.
-% Um Konflikte zu vermeiden, gibt es folgende Ansätze:
-% \begin{itemize}
-% 	\item \textbf{Version Number pro Record (Timestamp):} Beim Laden wird die Versionsnummer als Sessionzustand vermerkt. -> Beim Speichern wird validiert: DB-Timestamp = Objekt-Timestamp, dann OK, speichern und Timestamp erhöhen. Wenn NICHT gleich -> Versionskonflikt
-% 	\item \textbf{Concurrency Token:} Beim Ändern der Daten -> Originalwerte wegkopieren -> Beim Speichern diese ebenfalls mitgeben -> Validierung: DB-Felder = Objekt-Felder, wenn ja, dann speichern, sonst Versionskonflikt!
-% \end{itemize}
-% \newpage
-% \textbf{Deklaration Timestamp}
-% \begin{lstlisting}
-% // Fluent API
-% modelBuilder.Entity<Order>()
-%   .Property(p => p.Timestamp)
-%   .IsRowVersion(); 
-
-% // Data Annotation
-% public class Order {
-%   [Timestamp]
-%   public byte[] Timestamp { get; set; }
-%   ...
-% }
-% \end{lstlisting}
-
-% \textbf{Deklaration Concurrency Token}
-% \begin{lstlisting}
-% // Fluent API
-% modelBuilder.Entity<Order>()
-%   .Property(p => p.Name)
-%   .IsConcurrencyToken(); 
-% modelBuilder.Entity<Order>()
-%   .Property(p => p.Price)
-%   .IsConcurrencyToken(); 
-
-% // Data Annotation
-% public class Order {
-%   [ConcurrencyCheck]
-%   public string Name { get; set; }
-%   [ConcurrencyCheck]
-%   public double Price { get; set; }
-%   ...
-% }
-% \end{lstlisting}
-
-% \textbf{Beispiel Transaktion}
-% \begin{lstlisting}
-% using (var context = new ExtendedNorthwindEntities()) {
-% 	var cat = context.Categories.First(e => e.CategoryName == "X");
-% 	cat.Description = "BlaBla";
-% 	try {
-% 		int affected = context.SaveChanges();
-% 	} catch (DBUpdateConcurrencyException) {
-% 		var entry = context.Entry(cat);
-% 		entry.Reload();
-
-% 		 // And saving the changes again
-% 		 context.SaveChanges();
-% 	 }
-% } // Context close -> invalidates cache and connection goes back into pool
-% \end{lstlisting}
-
-% \textbf{Konflikte behandeln:}
-% Optionen:
-% \begin{itemize}
-%     \item Ignorieren
-%     \item Benutzer fragen
-%     \item Autokorrektur
-% \end{itemize}
-
-% \textbf{Autokorrektur:}
-% \begin{lstlisting}
-% ...
-% } catch (DBUpdateConcurrencyException e) {
-%     foreach(var entry in e.Entries) {
-%         if(entry.Entity is Order) {
-%             var proposedValues = entry.CurrentValues;
-%             var dbValues = entry.GetDatabaseValues();
-
-%             foreach(var prop in proposedValues.Properties) {
-%                 var proposedVal = proposedValues[prop];
-%                 var dbVal = dbValues[prop];
-
-%                 // Decide which values should be written to DB...
-%                 // ...
-%                 proposedValues[prop] = valueToSave;
-%             }
-
-%             // Refresh original values to bypass next concurrency check...
-%             entry.OriginalValues.SetValues(dbValues);
-%         }
-%     }
-% }
-% \end{lstlisting}
-
-% \subsection{LINQ to Entities}
-% \begin{itemize}
-%     \item LINQ to Entites Queries werden zu Expression Trees kompiliert
-%     \item \textbf{Nicht alle .NET Expressions können in DB-Syntax (SQL) übersetzt werden! -> Client Evaluation!}
-%     \item z.B. hat GROUP BY in Vergangenheit in bestimmten Versionen von EF Probleme gehabt (z.T. Client Eval., in anderen Versionen nicht...)
-% \end{itemize}
-
-% \subsection{CRUD Entities}
-% \subsubsection{Simple CRUD}
-% \begin{lstlisting}
-% using (var context = new ExtendedNorthwindEntities()) {
-%     // ----- Adding -------
-%     Magician mag = new Magician { Name = "Sharon" };
-
-%     context.Add(mag); // Apply the whole graph, same as:
-%     context.Magicians.Add(mag);
-
-%     // only for this entity
-%     context.Entry(mag).State = EntityState.Added;
-
-%     context.SaveChanges();
-
-%     // Check PK
-%     int id = mag.Id; // is now populated - hopefully ;)
-
-%     // ----- Removing -------
-%     Magician mag = context.Magicians.First(m => m.Name == "Sharon");
-
-%     // apply to while graph
-%     context.Remove(mag);
-%     context.Magician.Remove(mag);
-
-%     // only for this entity
-%     context.Entry(mag).State = EntityState.Deleted;
-
-%     context.SaveChanges();
-
-%      // ----- Update -------
-%      Magician mag = context.Magicians.First(m => m.Name == "Sharon");
-%      mag.Name = "123";
-
-%      context.SaveChanges();
-
-% }
-% \end{lstlisting}
-
-% \subsubsection{CRUD Relationship}
-% \begin{lstlisting}
-% using (var context = new ExtendedNorthwindEntities()) {
-%     Order o = context.Orders.Include(o => o.OrderItems).First();
-
-%     // Bsp. 1
-%     o.OrderItems.Add(new OrderItem());
-%     context.SaveChanges();
-
-%     // Bsp. 2
-%     o.Owner = context.Owners.First(o => o.EmployeeId == 4);
-%     context.SaveChanges();
-% }
-% \end{lstlisting}
-
-% \subsubsection{Change Tracker}
-% \begin{itemize}
-%     \item Registiert alle Änderungen der getrackten Entites (mittels Proxy Objekt)
-%     \item Aktualisiert den Entity-State, der aber auch manuell verändert werden kann
-% \end{itemize}
-
-% Verhalten des States:
-% \begin{itemize}
-%     \item Add() -> Added (State)
-%     \item Remove() -> Deleted
-%     \item Update() -> Modified
-%     \item Unchanged() -> Unchanged
-%     \item Add() / Remove() \textbf{berücksichtigen gesamten Objekt-Graphen!}
-%     \item State(e).State = .. -> \textbf{Nur die jeweilige Entity!}
-% \end{itemize}
-
-% \textbf{SaveChanges()} setzt State zurück auf \textbf{Unchanged}.
-% \begin{figure}[ht]
-% \centering
-% \includegraphics[width=0.6\linewidth]{images/entity-framework_change-tracker.png}
-% \end{figure}
-% \begin{figure}[ht]
-% \centering
-% \includegraphics[width=0.9\linewidth]{images/entity-framework_change-tracker-example.png}
-% \end{figure}
-
-
-
-% \section{WCF: Windows Communication Foundation}
-% WCF wird verwendet um zwischen Prozessen zu kommunizieren die auch nicht auf dem selben Gerät laufen müssen. Dabei geht es besonders um die Kommunikation zwischen Applikationen, da bei Serveranfragen heutzutage eher auf REST gesetzt wird. WCF ist serviceorientiert und kommt direkt mit dem Visual Studio. Es verwendet standardmässig SOAP, wobei auch andere Protokolle verwendet werden könnnen. 
-
-% \begin{figure}[ht]
-% \centering
-% \includegraphics[width=0.8\linewidth]{images/wcf_architecture}
-% \caption{WCF Architektur}
-% \label{fig:wcfarchitecture}
-% \end{figure}
-
-% \subsection{Gemeinsame Assembly}
-% Der Einsatz von gemeinsamen Assemblies, erlaubt eine direkte Programmierung gegen ein Interface, was die Entwicklung vereinfacht. Im Gegensatz zu Services, muss die Service Referenz nicht bei jeder Änderung neu generiert werden. Dafür kann ein gemeinsames Assembly nur von .NET Sprachen genutzt werden, ein Service aber auch von anderen Programmiersprachen. Ein weiterer Nachteil ist das verteilen von gemeinsamen Assemblies auf mehreren Geräten.
-
-% \subsection{Kommunikationn}
-% \begin{itemize}
-% 	\item Es gibt immer einen Client (\lstinline|ClientBase<T>|) und einen Service (\lstinline|ServiceHost|)
-% 	\item Ein Service kann mehrere Endpoints anbieten (Ports). Auch der Client hat einen Endpoint. Zwischen den beiden Endpoints werden dann Messages ausgetauscht. 
-% 	\item Die Typinformation kann beim Client verloren gehen, da aus kompatibilitätsgründen die generische Varianten von z.B Collections verwendet wird. Ebenfalls werden aus den Properties Methoden generiert, da andere Programmiersprachen, dieses Konstrukt nicht kennen
-% 	\item Es sollte nie die automatisch generierten Klassen des EntityFramework über den Service angeboten werden, da sich bei jeder Generierung die Schnittstelle ändern würde. Die Schnittstelle sollte als eigenes Objekt modelliert werden. Somit hat man die volle Kontrolle welche Felder nach aussen gereich werden. 
-% \end{itemize}
-
-
-% \clearpage
-
-% \subsection{Endpoint}
-% \begin{hint}{Prüfung}{}
-% 12\_WCF: Slide 10,11: Mögliche Frage. Warum konnte keine Verbindung aufgebaut werden. Da Binding Definitionen nicht matchen.
-% \end{hint}
-
-% Ein Service Endpoint wird benötigt um den Service zugreifbar zu machen. Jeder Endpoint besteht aus drei Elementen
-% \begin{description}
-% 	\item[A: Address] URL / URI (Where)
-% 	\item[B: Binding] Definition Übertragungskanal (How). Stimmen die Service Eigenschaften nicht mit den Bindings überein, kann keine Verbindung aufgebaut werden. 
-% 	\begin{itemize}
-% 		\item Kommunikationsmuster (Synchron, Asynchron, Duplex)
-% 		\item Encoding (Text, Binary)
-% 		\item Transport Methode (HTTP, TCP/UDP, Pipes)
-% 		\item Security
-% 		\item Reliabiity (Ordered, Unordered, E2E)
-% 		\item Transaction Managment
-% 		\item Client und Server müssen zwingend das gleiche Binding verwenden. Die Binding werden über MEX publiziert.
-% 	\end{itemize}
-% 	\item[C: Contract] Interface Definition, Daten Transfer Objekte / Messages (What)
-% \end{description}
-
-% \subsection{MEX: Meta Data Exchange Endpoint}
-% Ein Service kann ein MEX Endpoint zur Verfügung stellen, der die Spezifikation der Schnittstelle zurückliefert. (\textbf{WSDL}: Web Service Description Language). Visual Studio kann dann gemäss dem WSDL den Client Code generieren. Wenn der Service ändertn, muss natürlich auch der Client Code erneut generiert werden.
-
-% \begin{figure}[!ht]
-% \centering
-% \includegraphics[width=0.7\linewidth]{images/mex}
-% \caption{Metadata Exchange Point}
-% \label{fig:mex}
-% \end{figure}
-
-
-% \clearpage
-
-% \subsection{Contracts}
-% \begin{hint}{Prüfung}{}
-% 	Kommt ganz bestimmt an der Prüfung. Setzen der korrekten Attribute für die Service Definition
-% \end{hint}
-% Es gibt drei Arten von Contracts, die die Kommunikation zwischen Client und Server definieren. Die Contracts sollten immer explizit definiert werden, da standardmässig alle Felder im Object Graph serialisiert werden. (auch Passwörter, etc.)
-% \begin{description}
-% 	\item[Service Contract] Definiert Operationen, Verhalten und das Interaktionsmodell. Was macht der Service?
-% 	\item[Data Contract] Definiert übertragenen Datenstrukturen und Versionierung. Welche Objekte verwendet der Service? Definiert das Serialisierungsformat.
-% 	\item[Message Contract] Definiert die Messagestruktur (Header, Body). Wie sehen die SOAP Nachrichten aus?
-% \end{description}
-% \begin{lstlisting}[caption=Service Contract]
-% [ServiceContract]
-% public interface ITimeService {
-% 	[OperationContract]
-% 	string GetTime();
-
-% 	// custom name
-% 	[OperationContract(name="GetTimeDescr")]
-% 	TimeDescData GetTimeDesc();
-
-% 	// async
-% 	[OperationContract(IsOneWay=true)]
-% 	void StoreTime();
-% }
-
-% public class TimeService : ITimeService {
-% 	public string GetTime() { 
-% 		return DateTime.Now.ToString(); 
-% 	}
-% 	public TimeDescData GetTimeDesc() { 
-% 		return new TimeDescData();
-% 	}
-% }
-% \end{lstlisting}
-
-% \begin{lstlisting}[caption=Data Contract]
-% [DataContract]
-% public class TimeDescData {
-% 	public TimeDescData() {
-% 		TimeLong =
-% 		DateTime.Now.ToLongDateString();
-% 		TimeShort =
-% 		DateTime.Now.ToShortDateString();
-% 	}
-
-% 	[DataMember]
-% 	public string TimeShort { get; set; }
-
-% 	[DataMember]
-% 	public string TimeLong { get; set; }
-% }
-
-
-% [DataContract]
-% public enum TestType {
-% 	[EnumMember]
-% 	A,
-% 	[EnumMember]
-% 	B
-% }
-% \end{lstlisting}
-
-% \subsection{Vererbung}
-% Bei vererbten DataContracts muss mit \lstinline|KnownType()| explizit deklariert werden, welche Subklassen ebenfalls serialisiert werden.
-% \begin{lstlisting}[caption=Data Contract Vererbung]
-% [ServiceContract]
-% public interface IClassroomService {
-% 	[OperationContract]
-% 	List<Student> GetStudents();
-% }
-
-% [KnownType(typeof(TiredStudent))]
-% [KnownType(typeof(BoredStudent))]
-% [DataContract]
-% public class Student { }
-
-% [DataContract]
-% public class TiredStudent : Student { }
-
-% [DataContract]
-% public class BoredStudent : Student { }
-% \end{lstlisting}
-
-% Wenn der Known Type hinter einem Interface versteckt ist, muss dieses explizit mit dem Keyword \lstinline|ServiceKnownType| angegeben werden.
-% \begin{lstlisting}[caption=Service Known Data Contract Vererbung]
-% [ServiceContract]
-% public interface IClassroomService {
-% 	[ServiceKnownType(typeof(Teacher))]
-% 	[OperationContract]
-% 	List<ITeacher> GetTeachers();
-% }
-
-% [DataContract]
-% public class Teacher : ITeacher { }
-% public interface ITeacher { }
-% \end{lstlisting}
-
-% \clearpage
-
-% \subsection{Serialisierung von Referenzen}
-% Standardmässig werden alle public Variablen separat serialisiert. Man kann mit dem Keyword \lstinline|IsReference = true| aber erzwingen, dass \textbf{Referenzierte Objekte} sich auch nach der Serialisierung referenzieren.
-% \begin{lstlisting}[caption=Serialisierung von Referenzen]
-% [DataContract]
-% public class MainDto {
-% 	public MainDto() {
-% 		Content1 = new ContentDto();
-% 		Content2 = Content1; // Reference
-% 	}
-% 	[DataMember] 
-% 	public ContentDto Content1;
-% 	[DataMember] 
-% 	public ContentDto Content2;
-% }
-
-% [DataContract(IsReference = true)]
-% public class ContentDto { 
-% 	.. 
-% }
-% \end{lstlisting}
-
-% \subsection{Faults}
-% Da Exceptions nicht serialisierbar sind, müssen als \textbf{FaultContract} definiert werden. Damit können Exceptions an den Client übermittelt werden. Man macht dabei gebrauch von der Klasse \lstinline|FaultException| rsp. \lstinline|FaultException<>|. Damit FaultContracts verwendet werden könnne, darf der OperationContract \textbf{nicht asynchron} definiert sein (\lstinline|[OperationContract(IsOneWay=true)]|). Ansonsten käme die Exception nie an.
-% \begin{lstlisting}[caption=Data Contract]
-% // Service Definition
-% [ServiceContract]
-% public interface ICalculator {
-% 	[OperationContract]
-% 	int Multiply(int n1, int n2);
-
-% 	[OperationContract]
-% 	[FaultContract(typeof(MathFault))]
-% 	int Divide(int n1, int n2);
-% }
-
-% // Server 
-% try { 
-% 	return n1 / n2; 
-% } catch (DivideByZeroException) {
-% 	MathFault mf = new MathFault {
-% 		Operation = "division",
-% 		ProblemType = "divide by zero"
-% 	};
-% 	throw new FaultException<MathFault>(mf);
-% }
-
-% // Client
-% catch(FaultException<MathFault> e) { .. }
-% \end{lstlisting}
-
-% \subsection{Service Hosting}
-% Der WCF Service kann entweder in der \lstinline|App.config| deklariert oder direkt im Code erstellt werden
-% \begin{lstlisting}[language=XML, caption=App.config]
-% <services>
-% 	<service behaviorConfiguration="TimeService.TimeServiceBehavior" name="TimeService.TimeService">
-% 	<endpoint address="" binding="basicHttpBinding" contract="TimeService.ITimeService"/>
-% 	<endpoint address="mex" binding="mexHttpBinding" contract="IMetadataExchange"/>
-% 	<host>
-% 		<baseAddresses>
-% 			<add baseAddress="http://localhost:8732/TimeService/"/>
-% 		</baseAddresses>
-% 	</host>
-% 	</service>
-% </services>
-
-% <!-- Definition des behaviorConfiguration des Services ->
-% <behaviors>
-% 	<serviceBehaviors>
-% 		<behavior name="TimeService.TimeServiceBehavior">
-% 			<serviceMetadata httpGetEnabled="True"/>
-% 			<serviceDebug includeExceptionDetailInFaults="False"/>
-% 		</behavior>
-% 	</serviceBehaviors>
-% </behavior>
-
-
-% // usage (immer die Klasse, nie das Interface) -> korreliert mit service name im App.config
-% ServiceHost myHost = new ServiceHost(typeof(TimeService.TimeService))
-% \end{lstlisting}
-% \begin{lstlisting}[caption=Service Hosting (Code) ]
-% Uri myAddress = new Uri("http://localhost:8732/TimeService");
-% BasicHttpBinding myBinding = new BasicHttpBinding();
-% using (ServiceHost myHost = new ServiceHost(typeof(TimeService.TimeService), myAddress))
-% {
-% 	myHost.AddServiceEndpoint(typeof(TimeService.ITimeService), myBinding, myAddress);
-% 	myHost.Open();
-% 	Console.WriteLine("Service ready. Hit <RETURN> to quit.");
-% 	Console.ReadLine();
-% }
-% \end{lstlisting}
-
-
-
-% \clearpage
-
-% \subsection{Asynchron und Synchrone Kommunikation}
-% \begin{lstlisting}[caption=Data Contract]
-% // default synchron
-% public interface ICalculator {
-% 	[OperationContract]
-% 	int Add(int n1, int n2);
-% }
-
-% // One way async call
-% [ServiceContract]
-% public interface ICalculator {	
-% 	[OperationContract(IsOneWay = true)]
-% 	void StoreProblem(ComplexProblem p);
-% }
-
-% // Duplex with async callbacks
-% [ServiceContract(SessionMode = SessionMode.Required, CallbackContract = typeof(ICalcCallback))]
-% public interface ICalculatorDuplex {
-% 	[OperationContract(IsOneWay = true)]
-% 	void AddTo(double n);
-% }
-
-% public class CalculatorService : ICalculatorDuplex {
-
-% 	public void AddTo(double n){
-% 		result += n;
-% 		Callback.Result(result);
-% 	}
-% 	ICalcCallback Callback {
-% 		get {
-% 			return OperationContext.Current.GetCallbackChannel<ICalcCallback>();
-% 		}
-% 	}
-% }
-% \end{lstlisting}
-
-% \clearpage
-
-% \subsection{Instanzmodelle}
-% Es gibt drei verschiedenen Instanzmodelle. Das Instanzmodell wird bei der Service \textbf{IMPLEMENTATION} angegeben.
-% \begin{enumerate}
-% 	\item \textbf{Single}: Ein Service Objekt für sämtliche Clients (Singleton). Der Status ist gebunden an die Service Instanz und deren Laufzeit. 
-% 	\item \textbf{Per Call}: Ein neues Service Objekt pro Call / vollkommen stateless 
-% 	\item \textbf{Per Session}: Ein neues Service Objekt pro Session / Status gebunden an Client Session und deren Laufzeit. Der Session Mode wird auf dem INTERFACE angegeben. (Workflow getriebene Anwendungen)
-% \end{enumerate}
-
-% \begin{lstlisting}[caption=Instanzmodelle]
-% [ServiceBehavior(
-% 	InstanceContextMode
-% 	= 	InstanceContextMode.Single
-% 		InstanceContextMode.PerCall
-% 		InstanceContextMode.PerSession)]
-% public class CounterService : ICounterService {
-% 	public void InitializeCounter(int value) { /* ... */ }
-% 	public void Increment() { /* ... */ }
-% 	public void EndCounting() { /* ... */ }
-% }
-
-% // Per Session Spezialfall
-% [ServiceContract(
-% 	SessionMode = SessionMode.Allowed
-% 	SessionMode.NotAllowed
-% 	SessionMode.Required)]
-% public interface ICounterService {
-
-% 	// Default: IsInitiating = true
-% 	[OperationContract] 
-% 	void InitializeCounter(int value);
-
-% 	[OperationContract(IsInitiating = false)]
-% 	void Increment();
-
-% 	[OperationContract(
-% 		IsInitiating = false,
-% 		IsTerminating = true)]
-% 	void EndCounting();
-% }
-% \end{lstlisting}
-
-% \clearpage
-
-% \subsection{Reliability}
-% \begin{lstlisting}[caption=WCF Reliability]
-% [DeliveryRequirements(
-% RequireOrderedDelivery = true,
-% QueuedDeliveryRequirements
-% 	= 	QueuedDeliveryRequirementsMode.Allowed
-% 		QueuedDeliveryRequirementsMode.NotAllowed
-% 		QueuedDeliveryRequirementsMode.Required)]
-% public class CounterService : ICounterService {
-% 	public void InitializeCounter(int value) { /* ... */ }
-% 	public void Increment() { /* ... */ }
-% 	public void EndCounting() { /* ... */ }
-% }
-% \end{lstlisting}
-
-% \subsection{Concurrency}
-% Die Concurrency wird auf der Service Implementierung angegeben.
-% \begin{lstlisting}[caption=WCF Concurrency]
-% [ServiceBehavior(
-% ConcurrencyMode
-% 	  = ConcurrencyMode.Single
-% 		ConcurrencyMode.Multiple
-% 		ConcurrencyMode.Reentrant
-% 	public class CounterService : ICounterService {
-% 	public void InitializeCounter(int value) { /* ... */ }
-% 	public void Increment() { /* ... */ }
-% 	public void EndCounting() { /* ... */ }
-% }
-% \end{lstlisting}
-
-% \subsection{Transaktionen}
-% \begin{lstlisting}
-% // interface
-% [ServiceContract] 
-% interface IBankTransaction {
-% 	[TransactionFlow(
-% 		TransactionFlowOption.NotAllowed
-% 		TransactionFlowOption.Allowed
-% 		TransactionFlowOption.Mandatory)]
-% 	[OperationContract]
-% 	void Transfer(Account from, Account to, decimal amount);
-
-% 	[TransactionFlow(TransactionFlowOption.Mandatory)]
-% 	[OperatioNContract]
-% 	void TransferTxSafe(Acoount from, Account to, decimal amount);
-% }
-
-% // service implementierung
-% [ServiceBehavior(TransactionAutoCompleteOnSessionClose = ture,
-% 	ReleaseServiceInstanceOnTransactionComplete = true)]
-% public class BankTransaction : IBankTransaction {
-% 	[OperationBehavior(
-% 		TransactionScopeRequired=false,
-% 		TrnasactionAutoCompelte = true)]
-% 	public void Transfer(Account from, Account to, decimal amout) {
-% 		..
-% 	}
-
-% 	[OperationBehavior(
-% 		TransactionScopeRequired=true),
-% 		TransactionAutoComplete=false]
-% 	public void TransferTxSafe(Account ffom, Account to, decimal amount) {
-% 		..
-% 		OperationContext.Current.SetTransactionComplete();
-% 	}
-% }
-
-% //client code
-% using (TransactionScope ts = new TransactionScope()) {
-% 	client.TransferTxSafe(acct1, acct2, 10);
-% 	client.TransferTxSafe(acct1, acct3, 20);
-
-% 	ts.Complete();
-% }
-% \end{lstlisting}
-
-% \begin{lstlisting}
-% <bindings>
-% 	<wsHttpBinding>
-% 		<binding name="SampleBinding" transactionFlow="true" />
-% 	</wsHttpBinding>
-% </binding>
-% \end{lstlisting}
-
-% \subsection{Throttling}
-% \begin{lstlisting}[caption=Service Throttling, language=XML]
-% <service
-% 	type="Calculator"
-% 	behaviorConfiguration="CalculatorBehavior">
-% 	<!-- endpoint definitions /-->
-% </service>
-% <behaviors>
-% 	<behavior configurationName="CalculatorBehavior" >
-% 		<serviceThrottling
-% 			maxConcurrentCalls="10"
-% 			maxConnections="10"
-% 			maxInstances="10"
-% 			maxPendingOperations="10" />
-% 		<serviceMetadata
-% 			httpGetEnabled="false" />
-% 		<serviceDebug
-% 			includeExceptionDetailInFaults="true" />
-% 	</behavior>
-% </behaviors>
-% \end{lstlisting}
-
-
-% % \section{gRPC}
-% % gRPC ist ein Protokoll zum Aufruf von Funktionen in verteilten Computersystemen. Es basiert auf dem Standard HTTP/2 und Protocol Buffers.
-
-% % \begin{itemize}
-% %     \item gRPC ist ein SDK
-% %     \item Request-Response-orientiert
-% %     \item Visual Studio (Code) Integration
-% %     \item Intelli-Sense
-% %     \item Debugging/Logging
-% %     \item Plattform-neutral (Win, OSX, Linux)
-% %     \item Kommunikation über HTTP/2
-% % \end{itemize}
-
-% % \begin{figure}[!ht]
-% % \centering
-% % \includegraphics[width=0.8\linewidth]{images/grpc-architecture}
-% % \caption{gRPC Architektur}
-% % \label{fig:mex}
-% % \end{figure}
-
-% % \begin{figure}[!ht]
-% % \centering
-% % \includegraphics[width=0.8\linewidth]{images/grpc-architecture-layers}
-% % \caption{gRPC Architekturschichten}
-% % \label{fig:mex}
-% % \end{figure}
-
-% % \begin{figure}[!ht]
-% % \centering
-% % \includegraphics[width=0.8\linewidth]{images/grpc-architecture-communication}
-% % \caption{gRPC Kommunikation}
-% % \label{fig:mex}
-% % \end{figure}
-
-% % \subsection{HTTP/2}
-% % \textbf{Multiplexing (Hauptgrund für Performancesteigerung vs HTTP/1)}
-% % \begin{itemize}
-% %     \item Mehrere gRPC Calls pro TCP/IP Connection (HTTP/1 nur 1 Call pro TCP/IP Conn.)
-% %     \item Massiv kleinerer Overhead für Disconnect/Reconnect (kleinere Latency)
-% % \end{itemize}
-
-% % \textbf{Bidirectional Streaming}
-% % \begin{itemize}
-% %     \item Asynchr., non-blocking Senden und Empfangen von Streams
-% %     \item Senden und Empfangen parallel möglich
-% % \end{itemize}
-
-% % \textbf{HTTPS}
-% % \begin{itemize}
-% %     \item HTTP/2 und gRPC basieren voll auf HTTPS
-% %     \item Kommunikation zwischen Client und Server stets verschlüsselt
-% % \end{itemize}
-
-% % \textbf{Header Kompression}
-
-% % \clearpage
-
-% % \subsection{Konzept}
-
-% % \subsubsection{Service Definition}
-% % \begin{lstlisting}
-% % syntax = "proto3";
-% % option csharp_namespace = "_First_Example";
-% % package Greet;
-
-% % // Service Definition
-% % service Greeter {
-% %   // Ein Greeting senden
-% %   rpc SayHello (HelloRequest) returns (HelloResponse);
-% % }
-
-% % // Request msg
-% % message HelloRequest {
-% %   string greeting = 1;
-% % }
-
-% % // Reponse msg
-% % message HelloResponse {
-% %   string reply = 1;
-% % }
-% % \end{lstlisting}
-
-% % \subsubsection{Service Implementation}
-% % \begin{lstlisting}
-% % public class GreeterService : Greeter.GreeterBase
-% % {
-% % 	public override async Task<HelloReply> SayHello(
-% % 		HelloRequest request,
-% % 		ServerCallContext context)
-% % 	{
-% % 		return await Task.FromResult(new HelloReply
-% % 		{
-% % 			Message = "Hello "+ request.Name
-% % 		});
-% % 	}
-% % }
-% % \end{lstlisting}
-
-% % \subsubsection{Client Implementation}
-% % \begin{lstlisting}
-% % // The port number(5001) must match the port of the gRPC server.
-% % GrpcChannel channel = GrpcChannel.ForAddress("https://localhost:5001");
-% % Greeter.GreeterClient client = new Greeter.GreeterClient(channel);
-
-% % HelloReply reply = await client.SayHelloAsync(
-% %     new HelloRequest { Name = GreeterClient }
-% % ); 
-
-% % Console.WriteLine("Greeting: " + reply.Message);
-% % \end{lstlisting}
-
-% % \subsection{REST vs gRPC}
-% % \begin{table}[ht]
-% % 	\centering
-% % 	\begin{tabularx}{\linewidth}{
-% %         >{\hsize=1\hsize}X
-% %         >{\hsize=1\hsize}X
-% %         >{\hsize=1\hsize}X
-% %       }
-% % 	%\begin{tabularx}{\linewidth}{ c L L }
-% % 		\toprule 
-% % 		\textbf{Feature} & \textbf{REST} & \textbf{gRPC} \\
-% % 		\midrule
-% % 		Contract & Optional (OpenAPI) & Required\\
-% % 		\hline
-% % 		Transport & HTTP/1.1 & HTTP/2\\
-% % 		\hline
-% % 		Payload & JSON (larger, human readable & Protobuf (small binary)\\
-% % 		\hline
-% % 		Formalisierung & Keine oder OpenApi & Strikte Spezifikation\\
-% % 		\hline
-% % 		Streaming & Client/Server & Client/Server bidirectional\\
-% % 		\hline
-% % 		Browser Support & Ja & Nein (benötigt grpc-web)\\
-% % 		\hline
-% % 		Security & Transport/HTTPS (optional) & Transport/HTTPS (zwingend)\\
-% % 		\hline
-% % 		Client Generierung & 3rd Party Tooling (OpenApi Spec., AutoRest, ...) & Ja\\
-% % 		\bottomrule 
-% % 	%\end{tabularx} 
-% % 	\end{tabularx}
-% % 	\caption{REST vs gRPC} 
-% % \end{table}
-
-% % \subsection{Protocol Buffers}
-% % \begin{itemize}
-% %     \item IDL: Interface Definition Language
-% %     \begin{itemize}
-% %         \item Subform einer Domain Specific Language (DSL)
-% %         \item Beschreibt ein Service-Interface plattform- und sprachneutral
-% %     \end{itemize}
-% %     \item Data Model: Beschreibt Messages (Request/Response-Objekte)
-% %     \item Wire Format: Beschreibt Binärformat zur Übertragung
-% %     \item Serialisierungs-/Deserialis.-Mechanismus
-% %     \item Service-Versionierung
-% % \end{itemize}
-
-% % \subsubsection{Fields / Scalar Value Types}
-% % \begin{table}[ht]
-% % 	\centering
-% % 	\begin{tabularx}{\linewidth}{
-% %         >{\hsize=0.5\hsize}X
-% %         >{\hsize=0.5\hsize}X
-% %         >{\hsize=0.5\hsize}X
-% %         >{\hsize=2.5\hsize}X
-% %       }
-% % 	%\begin{tabularx}{\linewidth}{ c L L }
-% % 		\toprule 
-% % 		\textbf{.proto} & \textbf{C\#} & \textbf{Default} & \textbf{Beschreibung} \\
-% % 		\midrule
-% % 		double & double & 0 & \\
-% % 		\hline
-% % 		float & float & 0 & \\
-% % 		\hline
-% % 		int32 & int & 0 & Uses variable length encoding. Inefficient for encoding negative numbers if your field is likely to have negative values, use sint32 instead.\\
-% %         \hline
-% %         int64 & long & 0 & Uses variable length encoding. Inefficient for encoding negative numbers if your field is likely to have negative values, use sint64 instead.\\
-% %         \hline
-% %         bool & bool & false & \\
-% %         \hline
-% %         string & string & <empty> & A string must always contain UTF 8 encoded or 7 bit ASCII text.\\
-% %         \hline
-% %         bytes & ByteString & <empty> & May contain any arbitrary sequence of bytes.\\
-% %         \hline
-% %         ...&&&\\
-% % 		\bottomrule 
-% % 	%\end{tabularx} 
-% % 	\end{tabularx}
-% % 	\caption{REST vs gRPC} 
-% % \end{table}
-
-% % \subsubsection{Proto-Files}
-% % \begin{itemize}
-% %     \item Datei-Endung: *.proto
-% %     \item Header: Allgemeine Definitionen, wie syntax, option, etc.
-% %     \item Services: 1 oder mehrere Services mit je 1 oder mehreren Service-Methoden
-% %     \item Messages Types: 1 oder mehrere Fields
-% %     \item Field definiert sich aus: Type, Unique Name, Unique Field Number (Versioning)
-% % \end{itemize}
-
-
-% % \newline\textbf{Service-Methoden haben immer genau 1 Parameter und 1 Rückgabewert!}
-% % \newline
-% % Für leere Message:
-% % \begin{lstlisting}
-% % import "google/protobuf/empty.proto";
-% % ...
-% % google.protobuf.Empty
-% % \end{lstlisting}
-% % verwenden.
-% % ~\newline
-
-% % \newline\textbf{Fields:}\newline
-% % \begin{lstlisting}
-% % message FindRequest {
-% %     // Werte 1,2,3 sind Unique Field Numbers, Identifikator für Binärformat
-% %     string query = 1,
-% %     int32 page_number = 2, // Use Lower Snake Case (underscores)
-% %     int32 page_size = 3
-% % }
-% % \end{lstlisting}
-% % Fields können \textbf{Skalare Werte, andere Message Types, Enumerations} sein!
-
-% % Zwei Arten von Fields:
-% % \begin{itemize}
-% %     \item Singular: Default / Skalarer Wert
-% %     \item Repeated: Liste von Werten
-% %     \begin{lstlisting}
-% %     message SearchResponse {
-% %         repeated string results = 1; // Liste von Strings 
-% %     }
-% %     \end{lstlisting}
-% % \end{itemize}
-
-% % \textbf{Enumerations}
-% % \begin{lstlisting}
-% % message SearchRequest {
-% %  Color searchColor = 1;
-% %  Size searchSize = 2;
-% %  Query query = 3;
-
-% %  enum Color {
-% %   RED = 0; // 0 must exist
-% %   GREEN = 1;
-% %  }
-% % }
-
-% % message Query {
-% %   string filter = 1;
-% % }
-
-% % enum Size {
-% %  S = 0; // 0 must exist
-% %  M = 1;
-% %  L = 2;
-% % }
-% % \end{lstlisting}
-
-% % \textbf{Reserved keyword}
-% % \begin{lstlisting}
-% % message SearchRequest {
-% %     reserved 1, 3, 20 to 30;
-% %     reserved "page_number",
-% %              "result_per_page";
-
-% %     string query = 1; // Compilerfehler
-% %     int32 page_number = 2; // Compilerfehler
-% %     int32 result_per_page = 3; // Compilerfehler
-% % }
-% % \end{lstlisting}
-
-% % \subsection{C\# API}
-
-% % \subsubsection{Project File}
-% % \begin{lstlisting}
-% % <Project Sdk="Microsoft.NET.Sdk">
-% %   <ItemGroup>
-% %     <None Remove="..\_Protos\common.proto" />
-% %     <None Remove="..\_Protos\auto.proto" />
-% %     <None Remove="..\_Protos\kunde.proto" />
-% %     <None Remove="..\_Protos\reservation.proto" />
-% %   </ItemGroup>
-
-% %   <ItemGroup>
-% %     <Protobuf Include="..\_Protos\common.proto" GrpcServices="None" ProtoRoot="..\_Protos" OutputDir=".\Protos\Generated" CompileOutputs="true">
-% %       <Link>Protos\common.proto</Link>
-% %     </Protobuf>
-% %     <Protobuf Include="..\_Protos\auto.proto" GrpcServices="Client" ProtoRoot="..\_Protos" OutputDir=".\Protos\Generated" CompileOutputs="true">
-% %       <Link>Protos\auto.proto</Link> <!-- File Link -->
-% %     </Protobuf>
-% %   </ItemGroup>
-
-% %   <ItemGroup>
-% %     <PackageReference Include="Google.Protobuf" Version="3.10.0" />
-% %     <PackageReference Include="Grpc.Net.Client" Version="2.24.0" />
-% %     <PackageReference Include="Grpc.Tools" Version="2.24.0">
-% %       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-% %       <PrivateAssets>all</PrivateAssets>
-% %     </PackageReference>
-% %   </ItemGroup>
-
-% % </Project>
-% % \end{lstlisting}
-
-% % \subsubsection{Service Registration}
-% % Startup.cs:
-% % \begin{lstlisting}
-% % public class Startup {
-% %  public void ConfigureServices(IServiceCollection services)
-% %  {
-% %     services.AddGrpc(); // gRPC types via DI Injection registrieren
-% %  }
-
-% %  public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-% %  {
-% %   // Wenn nicht registriert, dann Exception bei Gebrauch: 'StatusCode =Unimplemented,Detail="Service is unimplemented.")’
-% %     // ...
-% %     app.UseEndpoints(ep => {
-% %         // Definition der Endpoints
-% %         ep.MapGrpcService<MyUpdateService>();
-% %         ep.MapGrpcService<MyInformationService>();
-% %     // ...
-% %     });
-% %     // ...
-% %  }
-% % }
-% % \end{lstlisting}
-
-% % \subsubsection{Client}
-% % \begin{lstlisting}
-% % // The port number (5001) must match the port of the gRPC server.
-% % GrpcChannel channel = GrpcChannel.ForAddress("https://localhost:5001");
-% % // Customer service calls
-% % var customerClient = new CustomerService.CustomerServiceClient(channel);
-% % var request1 = new Empty(); // Generiert aus "rpc GetCustomers(google.protobuf.Empty) returns...
-
-% % GetCustomersResponse response1 = await customerClient.GetCustomersAsync(request1);
-% % Console.WriteLine(response1);
-
-% % var request2 = new GetCustomerRequest { IdFilter = 1 };
-% % GetCustomerResponse response2 = await customerClient.GetCustomerAsync(request2);
-% % Console.WriteLine(response2);
-
-% % request2.IncludeOrders = false;
-% % response2 = await customerClient.GetCustomerAsync(request2);
-% % Console.WriteLine(response2);
-% % \end{lstlisting}
-
-% % \subsubsection{Server}
-% % \begin{lstlisting}
-% % public class GreeterService : Greeter.GreeterBase {
-% %     public override async Task<HelloReply> SayHello(
-% %         HelloRequest request,
-% %         ServerCallContext context)
-% %     {
-% %         return await Task.FromResult(new HelloReply
-% %         {
-% %             Message = "Hello "+ request.Name
-% %         });
-% %     }
-% % }
-% % \end{lstlisting}
-
-% % \subsection{Streams}
-% % Mit \textbf{stream} Keyword vor Typenbezeichnung kann Stream definiert werden.
-% % \begin{lstlisting}
-% % service FileStreamingService {
-% %     rpc ReadFiles (google.protobuf.Empty) // Server streaming call
-% %         returns (stream FileDto);
-
-% %     rpc SendFiles (stream FileDto)  // Client streaming call
-% %         returns (google.protobuf.Empty);
-
-% %     rpc RoundtripFiles (stream FileDto) // Bidirectional stream
-% %         returns (stream FileDto);
-% % }
-
-% % message FileDto {
-% %     string  file_name  =  1; 
-% %     int32  line  =  2; 
-% %     string content = 3;
-% % }
-% % \end{lstlisting}
-
-% % \subsubsection{Server streaming call}
-% % \begin{lstlisting}
-% % // Client
-% % using  (AsyncServerStreamingCall<FileDto>  call  =  client.ReadFiles(new Empty()))
-% % {
-% %     await  foreach  (FileDto  message  in  call.ResponseStream.ReadAllAsync())
-% %     {
-% %         WriteLine($"File:  {message.FileName},  Line  Nr:  {message.Line},  Line  Content:  {message.Content}");
-% %     }
-% % }
-
-% % // Server
-% % public override async Task ReadFiles(
-% %  Empty request,
-% %  IServerStreamWriter<FileDto> responseStream,
-% %  ServerCallContext context)
-% % {
-% %     string[] files = Directory.GetFiles(@ "...");
-% %     foreach(string file in files) {
-% %         string content;
-% %         int line = 0;
-% %         using StreamReader reader = File.OpenText(file);
-% % 		while ((content = await reader.ReadLineAsync()) != null) 
-% % 		{
-% % 			line++;
-% % 			FileDto reply = new FileDto {
-% % 				FileName = file, Line = line, Content = content
-% % 			};
-% % 			await responseStream.WriteAsync(reply);
-% % 		}
-% %     }
-% % }
-% % \end{lstlisting}
-
-% % \subsubsection{Client streaming call}
-% % \begin{lstlisting}
-% % // Client
-% % using  (AsyncClientStreamingCall<FileDto,  Empty>  call  =  client.SendFiles())
-% % {
-% %     string[]  files  =  Directory.GetFiles(@"Files");
-% %     foreach  (string  file  in  files)
-% %     {
-% %         string  content;  int  line  =  0;
-% %         using  StreamReader  reader  =  File.OpenText(file);
-% %         while  ((content  =  await  reader.ReadLineAsync())  !=  null)
-% %         {
-% %             line++;
-% %             FileDto reply = new FileDto {
-% %                 FileName  =  file,  Line  =  line,  Content  =  content,
-% %             };
-% %             await  call.RequestStream.WriteAsync(reply);
-% %         }
-% %     }
-% %     //  Required!!!
-% %     await  call.RequestStream.CompleteAsync(); // Close stream
-% %     await  call;  //  Wait  until  all  requests  are  submitted
-% % }
-
-% % // Server
-% % public override async Task Empty > SendFiles (
-% %   IAsyncStreamReader FileDto > requestStream ,
-% %   ServerCallContext context)
-% % {
-% %     await foreach(FileDto message in requestStream.ReadAllAsync())
-% %     {
-% %         WriteLine($"File: {message.FileName}, Line Nr: {message.Line}, Line Content: {message .Content}");
-% %     }
-% %     return new Empty();
-% % }
-% % \end{lstlisting}
-
-% % \subsubsection{Bidirectional}
-% % \begin{lstlisting}
-% % // Client 
-% % using  (AsyncDuplexStreamingCall<FileDto,  FileDto>  call  =  client.RoundtripFiles()) // No Parameters
-% % {
-% %     // Read
-% %     Task  readTask  =  Task.Run(async ()  => // Read Task, no await!
-% %     {
-% %         await  foreach  (FileDto  message  in  call.ResponseStream.ReadAllAsync())
-% %         {
-% %             WriteLine($"File:  {message.FileName},  Line  Nr:  {message.Line},  Line  Content:  {message.Content}");
-% %         }
-% %     });
-
-% %     // Write
-% %     string[]  files  =  Directory.GetFiles(@"Files"); 
-% %     foreach (string file in files)
-% %     {
-% %         string  content;  int  line  =  0;
-% %         using  StreamReader  reader  =  File.OpenText(file);
-% %         while  ((content  =  await  reader.ReadLineAsync())  !=  null)
-% %         {
-% %             line++;
-% %             FileDto reply = new FileDto {
-% %                 FileName  =  file,  Line  =  line,  Content  =  content,
-% %             };
-% %             await  call.RequestStream.WriteAsync(reply);
-% %         }
-% %     }
-
-% %     //  Required!!!
-% %     await  call.RequestStream.CompleteAsync();
-% %     await  readTask;  //  Wait  until  all  requests  are  submitted, await Read Task
-% % }
-
-% % // Server
-% % public override async Task RoundtripFiles( IAsyncStreamReader<FileDto>  requestStream, IServerStreamWriter<FileDto>  responseStream, ServerCallContext  context)
-% % {
-% %     await  foreach (FileDto  message  in  requestStream.ReadAllAsync())
-% %     {
-% %         await  responseStream.WriteAsync(message);
-% %         WriteLine($"File:  {message.FileName},  Line  Nr:  {message.Line},  Line  Content:  {message.Content}");
-% %     }
-% % }
-% % \end{lstlisting}
-
-% % \subsection{Well Known Types}
-% % \textbf{Timestamp}
-% % \begin{lstlisting}
-% % import "google/protobuf/timestamp.proto";
-
-% % message TimestampResponse {
-% %     google.protobuf.Timestamp results = 1;
-% % }
-
-% % Timestamp ts = new Timestamp
-% % {
-% %     // Seconds since 1970 01 01T00:00:00Z.
-% %     Seconds = DateTime.UtcNow.Second
-% % };
-% % // Works
-% % ts = Timestamp.FromDateTime(DateTime.UtcNow); // .Now Fails!!!
-
-% % DateTime dt = ts.ToDateTime();
-% % long s = ts.Seconds;
-% % \end{lstlisting}
-
-% % \textbf{Bytes/ByteString}
-% % \begin{lstlisting}
-% % // Empty ByteString
-% % ByteString  bs  =  ByteString.Empty;
-
-% % // To  ByteStream
-% % bs  =  ByteString.CopyFromUtf8("X"); 
-% % bs  =  ByteString.CopyFrom("X", Encoding.Unicode);
-% % bs  =  ByteString.CopyFrom(new  byte[0]);
-% % bs  =  ByteString.FromStream(null);  //  Any  Stream
-
-% % // From ByteStream
-% % string  r1  =  bs.ToStringUtf8();
-% % string  r2  =  bs.ToString(Encoding.Unicode); 
-% % byte[]  r3  =  bs.ToByteArray(); 
-% % bs.WriteTo(null);  //  Any  Stream
-% % \end{lstlisting}
-
-% % \textbf{Repeated Field (Collections}
-% % \begin{lstlisting}
-% % // proto
-% % message RepeatedResponse
-% %     repeated string results = 1;
-% % }
-
-% % // C#
-% % var response = new RepeatedResponse();
-
-% % // Single Add 
-% % response.Results.Add("Hello");
-
-% % //  Multiple  Add
-% % string[] arr =  { "A", "B" }; 
-% % response.Results.AddRange(arr);
-
-% % //  Compilerfehler, da Results readonly ist!
-% % response.Results = new RepeatedField<string>();
-% % \end{lstlisting}
-
-% % \textbf{Map}
-% % \begin{lstlisting}
-% % // proto
-% % message MapResponse {
-% %     map<int32,  string>  string  results  =  1;
-% % }
-
-% % // C#
-% % var  response  =  new  MapResponse();
-
-% % // Single Add 
-% % response.Results.Add(1,  "Hello");
-
-% % // IDictionary-like  Handling
-% % bool  exists  =  response.Results.ContainsKey(1); 
-% % string  result  =  response.Results[1];
-% % // ...
-% % \end{lstlisting}
-
-% % \subsection{Exception Handling}
-% % Grundsätzlich immer via \textbf{RpcException}. Basierend auf StatusCodes (ähnlich REST). Details über “Trailers” möglich.
-% % \begin{lstlisting}
-% % public class RpcException : Exception {
-% %     public  RpcException(Status  status);
-% %     public  RpcException(Status  status,  string  message);
-% %     public  RpcException(Status  status,  Metadata  trailers);
-% %     public  RpcException(Status  status,  Metadata  trailers,  string  message);
-
-% %     public Status Status { get; }
-% %     public  StatusCode  StatusCode  {  get;  }
-% %     public  Metadata  Trailers  {  get;  }
-% % }
-% % public struct Status
-% % {
-% %     public static readonly Status DefaultSuccess 
-% %         =  new  Status(StatusCode.OK,  "");
-% %     public  static  readonly  Status  DefaultCancelled
-% %         =  new  Status(StatusCode.Cancelled,  "");
-
-% %     public  Status(StatusCode  statusCode,  string  detail);
-% %     public StatusCode StatusCode { get; }
-% %     public  string  Detail	{  get;  } 
-% %     public  override  string  ToString();
-% % }
-% % \end{lstlisting}
-% % \textbf{Status Codes}
-% % \begin{itemize}
-% %     \item Ok
-% %     \item Cancelled: Operation cancelled
-% %     \item Unknown: Unbekannter Fehler
-% %     \item InvalidArgument
-% %     \item DeadlineException: Deadline erreicht
-% %     \item NotFound: Abgefragte Resource wurde nicht gefunden.
-% %     \item AlreadyExists: Zu erstellende Resource existiert bereits
-% %     \item PermissionDenied: Aufruf hat keine Berechtigung für diese Operation
-% %     \item Unauthenticated: Aufrufer ist nicht authentifiziert
-% %     \item ResourceExhausted: Eine Resource ist aufgebraucht (z.B. Rate Limit)
-% %     \item Internal: Interner allgemeiner Serverfehler
-% %     \item OutOfRange: Ungültiger Range bei Anfrage (Geburtsdatum in Zukunft etc.)
-% %     \item Unavailable: Service ist momentan nicht verfügbar
-% %     \item Aborted: Anfrage wurde abgebrochen (Concurrency Issues, Transaction rollback, ...)
-% % \end{itemize}
-
-% % \clearpage
-
-% % \textbf{Unhandled Exception}:\newline
-% % Wenn uncatched Exception auf Server geworfen wird -> Server Runtime fängt ihn und wirft RpcException, Status Code "Unknown" (ex.Status.Code = Unknown, ex.Status.Detail = Unhandled Exception, ext.Trailers = <leer>).
-% % \begin{lstlisting}
-% % public override async Task<Empty> Unhandled(
-% %   Empty  request,
-% %   ServerCallContext context)
-% % {
-% %     throw  new  Exception("Unhandled  Exception");
-% % }
-% % \end{lstlisting}
-
-% % \textbf{Handled Exception:}
-% % \begin{lstlisting}
-% % public override async Task<Empty> NotFound(
-% %   Empty  request,
-% %   ServerCallContext context)
-% % {
-% %     throw new RpcException(
-% %         new Status(StatusCode.NotFound, "Something was not found.") // Something was... = Detail
-% %     );
-% % }
-% % \end{lstlisting}
-
-% % \textbf{Handled Exception mit Trailer:}
-% % \begin{lstlisting}
-% % public override async Task<Empty> Trailers(
-% %   Empty  request,
-% %   ServerCallContext context)
-% % {
-% %     throw  new  RpcException( 
-% %         new Status(StatusCode.NotFound, "Something was not found."),
-% %         new Metadata {
-% %             {  "error-details",
-% %             "Here are some more details..." },
-% %             {  "error-obj"  +  Metadata.BinaryHeaderSuffix, Encoding.UTF8.GetBytes("...payload...")  }
-% %         }
-% %     );
-% % }
-% % \end{lstlisting}
-
-% % \subsection{Server/Client Configuration (Advanced)}
-% % \begin{lstlisting}
-% % // Server
-% % public  class  Startup
-% % {
-% %     public  void  ConfigureServices(IServiceCollection  services)
-% %     {
-% %         services
-% %         .AddGrpc(options  =>  //  Global
-% %         {
-% %             options.MaxSendMessageSize  =  5  *  1024  *  1024;  //  5  MB
-% %             options.MaxReceiveMessageSize  =  2  *  1024  *  1024;  //  2  MB options.EnableDetailedErrors  =  true; options.CompressionProviders  =  new  List<ICompressionProvider> {
-% %                 new  GzipCompressionProvider(CompressionLevel.Optimal)
-% %             };
-% %         })
-% %         .AddServiceOptions<MyConfigurationService>(options  =>  //  Specific  Service
-% %         {
-% %             options.MaxSendMessageSize  =  1  *  1024  *  1024;  //  1  MB
-% %         });
-% %     }
-% % }
-
-% % // Client
-% % GrpcChannel  channel  =  GrpcChannel.ForAddress( "https://localhost:5001",
-% %     new  GrpcChannelOptions
-% %     {
-% %         // Werte solten zu Server-Konfiguration passen
-% %         MaxSendMessageSize = 2 * 1024 * 1024, // 2 MB
-% %         MaxReceiveMessageSize  =  5  *  1024  *  1024,  //  5  MB
-% %         // ...
-% %     }
-% % );
-% % var  client  =  new  ConfigurationService.ConfigurationServiceClient(channel);
-% % \end{lstlisting}
-
-% % \subsection{Logging}
-% % \begin{lstlisting}
-% % // appsettings.json
-% % {
-% %     "Logging":  {
-% %         "LogLevel":  { 
-% %             "Default":  "Warning",
-% %             "Microsoft.Hosting.Lifetime":  "Information", 
-% %             "Grpc": "Debug"
-% %         }
-% %     },
-% %     ...
-% % }
-
-% % // oder per Code
-% % public  static  IHostBuilder CreateHostBuilder(string[]  args)  =>
-% %     Host.CreateDefaultBuilder(args)
-% %         .ConfigureLogging(logging  =>
-% %         {
-% %             logging.AddFilter("Grpc",  LogLevel.Debug);
-% %         })
-% % \end{lstlisting}
-
-% % \subsection{Deadlines}
-% % Deadlines sind nicht gleich Timeouts! Ein Deadline wird bei einer Kommunikation über mehrere RPC Instanzen laufend runtergezählt.
-
-% % \begin{lstlisting}
-% % // Variante 1
-% % CallOptions  callOptions  =  new  CallOptions(
-% %     deadline:  DateTime.UtcNow.AddMilliseconds(200)
-% % );
-% % await  client.DummyAsync(
-% %     new  Empty(),  callOptions
-% % );
-
-% % // Variante 2
-% % await  client.DummyAsync(
-% %     new  Empty(),
-% %     deadline:  DateTime.UtcNow.AddMilliseconds(200)
-% % );
-
-% % //  Zugriff  auf  Deadline  server-seitig
-% % public  override  async  Task<Empty>  Dummy( Empty  request,  ServerCallContext  context)
-% % {
-% %     Console.WriteLine(context.Deadline.ToString("O"));
-% % }
-% % \end{lstlisting}
-
-% % \subsection{Cancellation}
-% % \begin{lstlisting}
-% % // Variante 1
-% % // Timeouts benutzen
-
-% % // Variante 2
-% % var tokenSource = new CancellationTokenSource(); 
-% % var token  =  tokenSource.Token;
-
-% % tokenSource.CancelAfter(1111); 
-% % await  client.DummyAsync(
-% %     new  Empty(), 
-% %     cancellationToken:  token
-% % );
-
-% % //  Zugriff  auf  Deadline  serverseitig
-% % public  override  async  Task<Empty>  Dummy(Empty  request,  ServerCallContext  context)
-% % {
-% %     Console.WriteLine(context.CancellationToken.IsCancellationRequested);
-% % }
-% % \end{lstlisting}
 \section{GRPC: Google Remote Procedure Call}
 Neue Standard-Technologie für Backend-Kommunikation in .NET Core. Hohe Performance von zentraler Bedeutung. gRPC ist ein Software Development Kit (SDK), Request-Response-orientiert, Plattform- und Sprach-neutral.
 Kommunikation über HTTP/2 (Multiplexing (mehrere gRPC Calls pro TCP/IP Connection), Bidirectionales Streaming, Parallele Requests und Responses in einer einzigen TCP Verbindung, Kommunikation wegen HTTPS verschlüsselt).
