@@ -4290,7 +4290,7 @@ message SearchRequest {
 	\item \textbf{Proto-Compiler Output in ''obj'' Folder}
 \end{itemize}
 
-\paragraph{Aufbau Server Projekt} ASP.NET Core Projekt, erstellen via CLI (.net new grpc), NuGet Packages (Grpc.AspNetCore).
+\paragraph{Aufbau Server Projekt} ASP.NET Core Projekt, erstellen via CLI (dotnet new grpc), NuGet Packages (Grpc.AspNetCore).
 \begin{lstlisting}
 // Server Projekt
 <Project Sdk="Microsoft.NET.Sdk.Web">
@@ -4395,14 +4395,18 @@ public class MyOrderService : OrderService.OrderServiceBase {
 \begin{lstlisting}
 // The port number (5001) must match the port of the gRPC server.
 GrpcChannel channel = GrpcChannel.ForAddress("https://localhost:5001");
+
 // Customer service calls
 var customerClient = new CustomerService.CustomerServiceClient(channel);
+
 var request1 = new Empty();
 GetCustomersResponse response1 = await customerClient.GetCustomersAsync(request1);
 Console.WriteLine(response1);
+
 var request2 = new GetCustomerRequest { IdFilter = 1 };
 GetCustomerResponse response2 = await customerClient.GetCustomerAsync(request2);
 Console.WriteLine(response2);
+
 request2.IncludeOrders = false;
 response2 = await customerClient.GetCustomerAsync(request2);
 Console.WriteLine(response2);
@@ -4412,8 +4416,10 @@ Console.WriteLine(response2);
 \begin{lstlisting}
 // The port number (5001) must match the port of the gRPC server.
 GrpcChannel channel = GrpcChannel.ForAddress("https://localhost:5001");
+
 // Order service calls
 var orderClient = new OrderService.OrderServiceClient(channel);
+
 var request3 = new GetOrdersRequest { CustomerIdFilter = 1 };
 GetOrdersResponse response3 = await orderClient.GetOrdersAsync(request3);
 Console.WriteLine(response3);
@@ -4534,14 +4540,34 @@ using (AsyncDuplexStreamingCall<FileDto, FileDto> call = client.RoundtripFiles()
 \end{lstlisting}
 
 \subsection{Special Types}
+\paragraph{Empty} Platzhalte für Null-Werte \lstinline{var e = new Empty();}
 \paragraph{Timestamp} UTC Zeitstempel - muss UTC sein, es darf nicht DateTime.Now verwendet werden. \lstinline{Timestamp ts = Timestamp.FromDateTime(DateTime.UtcNow}
+\paragraph{Collections - Repeated Fields} Generiert ein Repeated Field Property, ist read only
+\begin{lstlisting}
+message RepeatedResponse { repeated string results = 1; }
+
+// Anwendung
+// Single Add
+response.Results.Add("Hello");
+// Multiple Add
+string[] arr = { "A", "B" };
+response.Results.AddRange(arr);
+// Compilerfehler
+response.Results = new RepeatedField<string>();
+\end{lstlisting}
+
 \paragraph{Collections - Map Fields} Generiert ein Map Field Property, ist read only
 \begin{lstlisting}
 message MapResonse { map<int32, string> string results = 1; }
+
+// Anwendung
 var response = new MapResponse();
 response.Results.Add(1, "Hello");
-response.Results.ContainsKey(1);    response.Results[1];
+response.Results.ContainsKey(1);    
+string result = response.Results[1];
 \end{lstlisting}
+
+
 \paragraph{Oneof} - Lässt eine Auswahl von Typen zu
 \begin{lstlisting}
 message OneofResponse {
@@ -4551,7 +4577,27 @@ message OneofResponse {
     }
 }
 \end{lstlisting}
-\paragraph{Any} - Repräsentiert einen beliebigen Wert\lstinline{google.protobuf.Any results = 1;}
+
+\paragraph{Bytes} - Binärer Datentyp
+\begin{lstlisting}
+message BinaryResponse {
+    bytes results = 1;
+}
+
+// Empty ByteString
+ByteString bs = ByteString.Empty;
+// To ByteString
+bs = ByteString.CopyFromUtf8("X");
+bs = ByteString.CopyFrom("X", Encoding.Unicode);
+bs = ByteString.CopyFrom(new byte[0]);
+bs = ByteString.FromStream(null); // Any Stream
+// From ByteString
+string r1 = bs.ToStringUtf8();
+string r2 = bs.ToString(Encoding.Unicode);
+byte[] r3 = bs.ToByteArray();
+bs.WriteTo(null); // Any Stream
+\end{lstlisting}
+\paragraph{Any} - Repräsentiert einen beliebigen Wert \lstinline{google.protobuf.Any results = 1;}
 
 \subsection{Exception Handling}
 Grundsätzlich immer via ''RpcException'' (basierend auf StatusCodes).
@@ -4569,18 +4615,14 @@ public class RpcException : Exception {
 \paragraph{Status Codes} \hfill
 \begin{figure}[!ht]
 	\centering
-	\begin{minipage}{.5\textwidth}
-		\centering
-		\includegraphics[width=0.49\linewidth]{images/grpc_status_codes_1.png}
-		\caption{$dt=0.1$}
-	\end{minipage}%
-	\begin{minipage}{0.5\textwidth}
-		\centering
-		\includegraphics[width=0.49\linewidth]{images/grpc_status_codes_2.png}
-		\caption{$dt =$}
-	\end{minipage}
+	\includegraphics[width=0.95\linewidth]{images/grpc_status_codes_1.png}
+	\caption{Statuscode 1/2}
 \end{figure}
-
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.95\linewidth]{images/grpc_status_codes_2.png}
+	\caption{Statuscode 2/2}
+\end{figure}
 
 \paragraph{Unbehandelte Exception} Exception wird auf Server nicht gefangen (Server Runtime fängt Exception, Wirft RpcException)
 \begin{lstlisting}
@@ -4598,6 +4640,27 @@ public override async Task<Empty> Trailers(Empty request, ServerCallContext cont
             { "error-obj" + Metadata.BinaryHeaderSuffix, Encoding.UTF8.GetBytes("...payload...") }
         }
     );
+}
+\end{lstlisting}
+
+\subsection{Cancellation}
+Cancellation TOken kann beim Aufruf mitgegeben werden. Parameter wird automatisch generiert. Zugriff auf Server via ServerCallContext.
+\begin{lstlisting}
+// Client
+CancellationTokenSource tokenSource = new();
+CancellationToken token = tokenSource.Token;
+
+tokenSource.CancelAfter(1111); // Zeitbasiert. Alternative token.Cancel()
+await client.DummyAsync(
+    new Empty(),
+    cancellationToken: token
+);
+
+// Zugriff auf Deadline server-seitig
+public override Task<Empty> Dummy(
+Empty request, ServerCallContext context)
+{
+	Console.WriteLine(context.CancellationToken.IsCancellationRequested);
 }
 \end{lstlisting}
 

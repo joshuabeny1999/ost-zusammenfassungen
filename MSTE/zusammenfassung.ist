@@ -1,5 +1,5 @@
 % makeindex style file created by the glossaries package
-% for document 'zusammenfassung' on 2022-11-26
+% for document 'zusammenfassung' on 2022-12-8
 actual '?'
 encap '|'
 level '!'
@@ -27,5 +27,3 @@ heading_suffix "\}\\relax \\glsresetentrylist "
 symhead_positive "glssymbols"
 numhead_positive "glsnumbers"
 page_compositor "."
-suffix_2p ""
-suffix_3p ""
