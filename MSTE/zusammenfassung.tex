@@ -4672,10 +4672,15 @@ Empty request, ServerCallContext context)
 	\caption{Typ-Hierarchie}
 	\label{fig:valuetypes}
 \end{figure}
-
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=0.8\linewidth]{images/reflection_navigation}
+	\caption{Objekt-Modell / Navigationspfade}
+	\label{fig:valuetypes}
+\end{figure}
 \subsection{Anwendungen}
 \begin{description}
-	\item[Metadaten erstellen] Darstellung der Metadaten in Tools
+	\item[Metadaten erstellen] Darstellung der Metadaten in Tools (Intelli Sense, Object Browser)
 	\item[Type Discovery] Suchen und Instanzieren von Typen, Zugriff auf dynamische Datenstrukturen.
 	\item[Late Binding (Methods/Properties] Aufruf von Methoden / Properties nach Type Discovery
 	\item[Reflection Emit / Code-Emittierung] Erstellen von Typen inkl. Members zur Laufzeit
@@ -4693,7 +4698,7 @@ typeof(MyClass) || typeof(int)
 Suche alle Typen in einem Assembly.
 \begin{lstlisting}[caption=Reflection: Type Discovery]
 Assembly a01 = Assembly.Load("mscorlib, PublicKeyToken=b77a5c561934e089, Culture=neutral, Version=4.0.0.0");
-// Assembly.Load("File.dll") File auslesen
+// Assembly.LoadFrom("File.dll") File auslesen
 Type[] t01 = a01.GetTypes();
 foreach (Type type in t01) {
 	Console.WriteLine(type);
@@ -4747,7 +4752,7 @@ Counter c = new Counter(1);
 FieldInfo[] fiAll = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
 	
 // Specific Field
-FieldInfo fi = type.GetField("countValue", BindingFlags.Instance | 	BindingFlags.NonPublic);
+FieldInfo fi = type.GetField("_countValue", BindingFlags.Instance | 	BindingFlags.NonPublic);
 	
 int val01 = (int) fi.GetValue(c);
 c.Increment();
@@ -4788,6 +4793,18 @@ MethodInfo mi = type.GetMethod("Increment");
 mi.Invoke(c, null);
 \end{lstlisting}
 
+\begin{lstlisting}[caption=Reflection: Method Info mit Parametern]
+Type type = typeof(System.Math);
+Type[] paramTypes = { typeof(int) };
+
+// Get method info for Cos( )
+MethodInfo miAbs = type.GetMethod("Abs", paramTypes);
+
+// Fill an array with the actual parameters
+object[] @params = { -1 };
+object returnVal = miAbs.Invoke(type,@params);
+\end{lstlisting}
+
 \subsection{Constructor Info}
 Die Constructor Info beschreibt ein Konstruktor einer Klasse (Name, Parameter, Sichtbarkeit). Wie Method Info leitet er wegen seinen ähnlichen Eigenschaften von \lstinline|MethodBase| ab und wird  mit \lstinline|Invoke()| aufgerufen.
 \begin{lstlisting}[caption=Reflection: Constructor Info]
@@ -4806,6 +4823,17 @@ ConstructorInfo ci02 = type.GetConstructor(BindingFlags.Instance|BindingFlags.No
 Counter c02 = (Counter)ci02.Invoke(null);
 \end{lstlisting}
 
+\begin{lstlisting}[caption=Reflection: Constructor Info Alternative via Activator]
+// Alternative
+Counter c03 = (Counter)Activator.CreateInstance(
+	typeof(Counter),
+	12 // , "further params", "", ...
+);
+
+// Alternative
+// -> when Public Default Constructor exists
+Counter c04 = Activator.CreateInstance<Counter>();
+\end{lstlisting}
 
 \subsection{Example of Reflection Usage}
 \begin{lstlisting}
@@ -4896,9 +4924,22 @@ public class BugfixAttribute : Attribute
 }
 
 // usage
-[Bugfix(121, "MichaelWieland", "14/12/16")]
+[Bugfix(121, "Manuel Bauer", "01/03/2015")]
+[Bugfix(
+107, "Manuel Bauer", "01/04/2015",
+Comment = "Some major changes! ;-)")]
+public class MyMath
+{
+	[Bugfix(121, "Manuel Bauer", "01/05/2015")]
+	public int MyInt { get; set; }
+
+	// Compilerfehler
+	[Bugfix(148, "Manuel Bauer", "01/06/2015")]
+	public event Action CalculationDone;
+	/* ... */
+}
 \end{lstlisting}
-\paragraph{CSV-Filter}
+\paragraph{CSV Mapper}
 \begin{lstlisting}
 // list
 var a = new List<Address> {
@@ -4999,331 +5040,6 @@ Console.WriteLine(ret);
 \begin{lstlisting}
 assemblyBuilder.Save(assemblyName.Name + ".dll");
 \end{lstlisting}
-
-
-% \section{Reflection}
-% Unter Reflection versteht man die Analyse von Metadaten eines Objekts zur Laufzeit. Mit Reflection lassen sich Typen suchen und instanzieren. Die abstrakte Basisklasse \lstinline|System.Type| representiert einen Typen. \lstinline|System.RuntimeType| erbt von \lstinline|System.Type|. Mit Reflection können auch \lstinline|private| Felder gelesen und geschreiben werden.
-
-% \begin{figure}[!ht]
-% \centering
-% \includegraphics[width=0.8\linewidth]{images/reflection-type-hiearchy}
-% \caption{Reflection Type-Hierarchy}
-% \label{fig:mex}
-% \end{figure}
-
-% \begin{figure}[!ht]
-% \centering
-% \includegraphics[width=0.8\linewidth]{images/reflection-navigation}
-% \caption{Reflection Navigation}
-% \label{fig:mex}
-% \end{figure}
-
-% \begin{lstlisting}[caption=Reflection]
-% this.GetType() // implemented on object
-% typeof(MyClass) || typeof(int)
-% \end{lstlisting}
-
-% \subsection{Type Discovery}
-% Suche alle Typen in einem Assembly.
-% \begin{lstlisting}[caption=Reflection: Type Discovery]
-% Assembly a01 = Assembly.Load("mscorlib, PublicKeyToken=b77a5c561934e089, Culture=neutral, Version=4.0.0.0");
-% Type[] t01 = a01.GetTypes();
-% foreach (Type type in t01)
-% {
-% 	Console.WriteLine(type);
-% 	MemberInfo[] mInfos = type.GetMembers();
-% 	foreach (var mi in mInfos)
-% 	{
-% 		Console.WriteLine(
-% 		"\t{0}\t{1}",
-% 		mi.MemberType,
-% 		mi);
-% 	}
-% }
-
-% // Output
-% ...
-% System.Int32
-%     Method Int32 CompareTo(System.Object)
-%     Method Int32 CompareTo(Int32)
-%     Method Boolean Equals(System.Object)
-%     Method Boolean Equals (Int32)
-%     ...
-%     Method System.String ToString()
-% ...
-% \end{lstlisting}
-
-
-% \subsection{Member auslesen}
-% Das Auslesen von Members kann mit \lstinline|BindingFlags| gefiltert werden.
-% \begin{lstlisting}[caption=Reflection: Members auslesen]
-% Type type = typeof(Counter);
-% MemberInfo[] miAll = type.GetMembers(); // Methods & Properties
-% foreach (MemberInfo mi in miAll) {
-% 	Console.WriteLine("{0} is a {1}", mi, mi.MemberType);
-% }
-% Console.WriteLine("----------");
-% PropertyInfo[] piAll = type.GetProperties();
-% foreach (PropertyInfo pi in piAll) {
-% 	Console.WriteLine("{0} is a {1}",	pi, pi.PropertyType);
-% }
-
-% // Output:
-% ...
-% Int32  get_CountValue()  is  a  Method 
-% Void  set_CountValue(Int32)  is  a  Method 
-% Void Increment() is a Method
-% Void Decrement() is a Method 
-% String  ToString()  is  a  Method 
-% Boolean Equals(Object) is a Method 
-% Int32  GetHashCode()  is  a  Method 
-% Type  GetType()  is  a  Method
-% Void  .ctor(Int32)  is  a  Constructor
-% Int32 CountValue is a Property 
-% PropertyChangedEventHandler  PropertyChanged is a Event
-% ----------
-% Int32  CountValue  is  a  Property
-% ...
-% \end{lstlisting}
-% \begin{lstlisting}
-% // ex2: filter members according to BindingFlag or Filtername
-% Type type = typeof(Assembly);
-% BindingFlags bf =
-% 	BindingFlags.Public |
-% 	BindingFlags.Static |
-% 	BindingFlags.NonPublic |
-% 	BindingFlags.Instance |
-% 	BindingFlags.DeclaredOnly;
-
-% System.Reflection.MemberInfo[] miFound = type.FindMembers(
-% 	MemberTypes.Method, bf, Type.FilterName, "Get*"
-% );
-
-% // Output
-% Assembly GetAssembly(Type) is a Method 
-% Int32  GetHashCode()  is  a  Method
-% Type  GetType_Compat(String,  String)  is  a  Method 
-% Assembly GetExecutingAssembly() is a Method 
-% Assembly GetCallingAssembly() is a Method 
-% Assembly GetEntryAssembly() is a Method
-% ...
-% \end{lstlisting}
-
-% \subsection{Field Information}
-% Die Field Info beschreibt ein Feld einer Klasse (Name, Typ, Sichtbarkeit). Die Felder können mit \lstinline|object GetValue(object obj)| und \lstinline|void SetValue(object obj, object value)| auch gelesen und geschrieben werden.
-
-% \begin{lstlisting}[caption=Reflection: Field Info]
-% Type type = typeof (Counter);
-
-% Counter c = new Counter(1);
-
-% // All Fields
-% FieldInfo[] fiAll = type.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
-
-% // Specific Field
-% FieldInfo fi = type.GetField("countValue", 
-% 	BindingFlags.Instance | 
-% 	BindingFlags.NonPublic);
-
-% int val01 = (int) fi.GetValue(c);
-% c.Increment();
-% int val02 = (int) fi.GetValue(c);
-% fi.SetValue(c, -999);
-% \end{lstlisting}
-
-% \subsection{Property Information}
-% Die Property Info beschreibt eine Property einer Klasse (Name, Typ, Sichbarkeit, Informationen zu Get/Set). Auch Properties lassen sich lesen und schreiben.
-% \begin{lstlisting}[caption=Reflection: Property Info]
-% Type type = typeof(Counter);
-% Counter c = new Counter(1);
-
-% // All Properties
-% PropertyInfo[] piAll = type.GetProperties();
-
-% // Specific Property
-% PropertyInfo pi = type.GetProperty("CountValue");
-
-% int val01 = (int)pi.GetValue(c);
-% c.Increment();
-% int val02 = (int)pi.GetValue(c);
-% pi.SetValue(c, -999);
-% \end{lstlisting}
-
-% \clearpage
-
-% \subsection{Method Info}
-% Die Method Info beschreibt eine Methode einer Klasse (Name, Parameter, Rückgabewert, Sichtbarkeit). Sie leitet von Klasse \lstinline|MethodBase| ab. Die Methode wird mit \lstinline|Invoke()| aufgerufen.
-% \begin{lstlisting}[caption=Reflection: Method Info]
-% Type type = typeof(Counter);
-% Counter c = new Counter(1);
-
-% // All Methods
-% MethodInfo[] miAll = type.GetMethods();
-
-% // Specific Method
-% MethodInfo mi = type.GetMethod("Increment");
-% mi.Invoke(c, null);
-% \end{lstlisting}
-
-% \subsection{Constructor Info}
-% Die Constructor Info beschreibt ein Konstruktor einer Klasse (Name, Parameter, Sichtbarkeit). Wie Method Info leitet er wegen seinen ähnlichen Eigenschaften von \lstinline|MethodBase| ab und wird  mit \lstinline|Invoke()| aufgerufen.
-% \begin{lstlisting}[caption=Reflection: Constructor Info]
-% Type type = typeof(Counter);
-% Counter c = new Counter(1);
-
-% // All Constructors
-% var ciAll = type.GetConstructors();
-
-% // Specific Constructor Overload 01
-% ConstructorInfo ci01 = type.GetConstructor(new[] { typeof(int) });
-% Counter c01 = (Counter)ci01.Invoke(new object[] { 12 });
-
-% // Specific Constructor Overload 02
-% ConstructorInfo ci02 = type.GetConstructor(BindingFlags.Instance|BindingFlags.NonPublic, null, new Type[0], null);
-% Counter c02 = (Counter)ci02.Invoke(null);
-
-% // Other examples
-
-% Type type = typeof(Program);
-
-% //get the public construcotrs
-% foreach (ConstructorInfo item in type.GetConstructors())
-% {
-%     Console.WriteLine("Name: " + item.Name + ", IsPublic: " + item.IsPublic + ", IsPrivate: " + item.IsPrivate + ", IsStatic: " + item.IsStatic);
-% }
-
-% //get the private constructors
-% foreach (ConstructorInfo item in type.GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic))
-% {
-%     Console.WriteLine("Name: " + item.Name + ", IsPublic: " + item.IsPublic + ", IsPrivate: " + item.IsPrivate + ", IsStatic: " + item.IsStatic);
-% }
-
-% //get the static constructors
-% foreach (ConstructorInfo item in type.GetConstructors(BindingFlags.Static | BindingFlags.NonPublic))
-% {
-%     Console.WriteLine("Name: " + item.Name + ", IsPublic: " + item.IsPublic + ", IsPrivate: " + item.IsPrivate + ", IsStatic: " + item.IsStatic);
-% }
-% Console.ReadLine();
-% \end{lstlisting}
-
-% \subsection{Attributes}
-% \begin{lstlisting}[caption=Reflection: Attributes]
-% Type type = typeof(MyMath);
-
-% // All Class Attributes
-% object[] aiAll = type.GetCustomAttributes(true);
-
-% // Check Definition
-% bool aiDef = type.IsDefined(typeof(BugfixAttribute));
-% \end{lstlisting}
-
-% \section{Attributes}
-% Attributes sind das C\# Pendant zu den Java Annotations. Bei Attributen geht es um die aspektorientierte Programmierung. z.B Erweiterung eines Attributes um eine Aspekt Serialisierung, Transactions, etc. Es können auch eigene Attribute geschrieben werden. Diese leiten immer von \lstinline|System.Attribute| ab. Attribute können mit über Reflection abgefragt werden. 
-% \begin{lstlisting}[caption=Attributes]
-% [DataContract, Serializable]
-% [Obsolete]
-% // Etc.
-% public class Auto {
-% 	[DataMember]
-% 	public string Marke { get; set; }
-% 	[DataMember]
-% 	public string Typ { get; set; }
-% }
-
-% // Beliebig viele Attribute
-% [DataContract][Serializabel] <=> [DataContract, Serializabel]
-
-% // Parameter
-% [DataContract]
-% [DataContract(Name="MyParam")] // Named Param
-% [Obsolete("Alt!",  true)] // Positional Param
-% [Obsolete("Alt!", IsError=true)] // Mixed
-% \end{lstlisting}
-
-% \subsection{Anwendungsfälle}
-% \begin{itemize}
-% 	\item Object-relationales Mapping
-% 	\item Serialisierung (WCF, XML)
-% 	\item Security und Zugriffsteuerung
-% 	\item Dokumentation
-% \end{itemize}
-
-% \subsection{Typen}
-% Man unterscheidet zwei Typen von Attributen
-% \begin{enumerate}
-% 	\item Intrinsic Attributes: Kommen bereits mit der \gls{clr} mit 
-% 	\item Custom Atttributes: Eigens definierte Attributre
-% \end{enumerate}
-
-% \clearpage
-
-% \subsection{Eigene Attribute}
-% Bei der Deklaration können die Objekte eingegrenzt werden, auf die das Attribute angewendet werden kann. Jedes Attribute muss als Postfix ''Attribute'' haben. (xxAttribute). Beim Verwenden wird der Postfix jedoch weggelassen.
-% \begin{lstlisting}[caption=Custom Attributes]
-% // declaration
-% [AttributeUsage(
-% 	AttributeTargets.Class |
-% 	AttributeTargets.Constructor |
-% 	AttributeTargets.Field |
-% 	AttributeTargets.Method |
-% 	AttributeTargets.Property,
-% 	AllowMultiple = true)]
-% public class BugfixAttribute : Attribute
-% {
-% 	public BugfixAttribute(int bugId, string programmer, string date) {..}
-% 	public int BugId { get; }
-% 	public string Date { get; }
-% 	public string Programmer { get; }
-% 	public string Comment { get; set; }
-% }
-
-% // usage
-% [Bugfix(121, "MichaelWieland", "14/12/16")]
-% \end{lstlisting}/
-
-% \begin{lstlisting}[caption=CSV Filter]
-% // list
-% var a = new List<Address> {
-% 	new Address("Hans", "Strasse 16", "8645", "Jona") ,
-% 	new Address("Hans2", "Strasse 2", "8645", "Jona")
-% }
-% Writer.SaveToCsv(a, @"C:\Temp\test.csv");
-
-% // address
-% public class Address {
-% 	[CsvName("Name"), Uppercase]
-% 	public string Name { get; set; }
-% 	[CsvName("Strasse"), Lowercase]
-% 	public string Street { get; set; }
-% 	[CsvName("Plz")]
-% 	public string Postcode { get; set; }
-% 	...
-% }
-
-% // Custom Attributes
-% public class CsvNameAttribute : Attribute {
-% 	public string Name { get; set; }
-% 	public CsvAttribute(string name) {
-% 		Name = name;
-% 	}
-% }
-
-% public interface IStringFilter {
-% 	string Filter(string arg); 
-% }
-
-% public class UppercaseAttribute : Attribute, IStringFilter {
-% 	public string Filter(string arg) {
-% 		return arg.ToUpper();
-% 	}
-% }
-
-% public class LowercaseAttribute : Attribute, IStringFilter {
-% 	public string Filter(string arg) {
-% 		return arg.ToLower();
-% 	}
-% }
-% \end{lstlisting}
 
 % % ------- appendix start -------
 
