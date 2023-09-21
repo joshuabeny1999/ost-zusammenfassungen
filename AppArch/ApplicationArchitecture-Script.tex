@@ -1,0 +1,36 @@
+\documentclass[a4paper]{article}
+
+% Configure your document here:
+\newcommand{\SUBJECT}{Application Architecture}
+\newcommand{\TITLE}{\LaTeX \space summary template}
+\newcommand{\SEMESTER}{HS2023}
+\newcommand{\SUBTITLE}{A documentation template}
+\newcommand{\STUDENT}{Marco Agostini\\Jan Untersander\\Joshua Beny Hürzeler}
+\newcommand{\CONTENTDEPTH}{2}
+
+\input{sections/header}
+
+% --------------------------
+\begin{document}
+\input{sections/front}
+
+\setcounter{tocdepth}{\CONTENTDEPTH}
+\tableofcontents
+\pagebreak
+
+% Add Sections here
+\include{sections/01_week}
+\include{sections/02_week}
+\include{sections/03_week}
+\include{sections/04_week}
+\include{sections/05_week}
+% Week 06,07,08 are all included in 05
+\include{sections/06_week}
+% Week 09, 10 are all included in 09
+\include{sections/09_week}
+\include{sections/11_week}
+\include{sections/12_week}
+\include{sections/13_week}
+
+
+\end{document}
