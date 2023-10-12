@@ -10,39 +10,59 @@ The Spring Framework consists of features organized into about 20 modules. These
   \label{fig:springframework}
 \end{figure}
 
+\begin{figure}[H]
+  \center
+  \includegraphics[width=0.65\textwidth]{spring-boot-architecture}
+  \caption{Spring Boot flow archidecture}
+\end{figure}
+
+\pagebreak
+\begin{lstlisting}
+@SpringBootApplication
+public class Application {
+  
+  public static void main(String[] args) {
+    SpringApplication.run(Application.class, args);
+  }  
+\end{lstlisting}
+
+
 \subsection{Justification}
 Why should we even use a Framework for the development of our software?
 \begin{itemize}
-	\item To reduce tedious and error prone programming work (create better code)
-	\item To raise level of abstraction and convenience by viewpoint/by layer (create less code)
+  \item To reduce tedious and error prone programming work (create better code)
+  \item To raise level of abstraction and convenience by viewpoint/by layer (create less code)
 \end{itemize}
+
 
 Where can and should framework development be considered?
 \begin{itemize}
-	\item Routine work that has to be done in many place (not domain-specific)
-	\item Risky activities such as embedded system development (facing real-time requirements such as guaranteed response time)
-	\item Labor-intensive system parts, e.g. user interfaces (server side, client side) and the Web, configuration management and (cloud) deployment
+  \item Routine work that has to be done in many place (not domain-specific): \textit{e.g. logging, testing, security configuration and other management tasks}
+  \item Risky activities such as embedded system development (facing real-time requirements such as guaranteed response time)
+  \item Need for the Dependency Injection pattern; hide venor/offering specifics
+  \item Labor-intensive system parts, e.g. user interfaces (server side, client side) and the Web, configuration management and (cloud) deployment
 \end{itemize}
+
+Hello world of springboot:
 
 \subsection{Spring Annotations}
 \begin{table}[H]
   \centering
   \begin{tblr}{colspec={|l|X|},hlines}
-    \textbf{Annotation} & \textbf{Meaning} \\
-    @SpringBootApplication & Convenience annotation, bundles @Configuration, @EnableAutoConfiguration and @ComponentScan \\
-    @Component & The generalized form considered as a candidate for auto-detection when using annotation-based configuration and classpath scanning. It extended to more specific forms such as @Controller, @Repository, and @Service. \\
-    @Controller & To indicate C in MVC pattern (presentation layer, dialog control) \\
-    @RequestMapping & URI pattern for of RESTful HTTP resources (JEE: JAX-RS) \\
-    @Service, @Repository & Specializations of @Component in Spring for DDD (lesson 6) \\
-    @Transactional & System transaction (ACID), container is transaction manager \\
-    @EnableCaching & Responsible for registering the necessary Spring components that power annotation-driven cache management \\
-    @Table, @Entity & Spring Data JPA, steer O/R mapping \\
-    @Query & Spring Data JPA, associates query with method \\
-    @Profile, @Primary, @Qualifier & Conditional bean registration (OS level, development stage, etc.) \\
-    @Autowired & Spring Framework; no need for DI getters/setters (JEE: @Inject) \\
-    @JMSListener & Defines the name of the Destination that this method should listen to. (JEE: @MessageDriven) \\
-    @JMSTemplate & JmsTemplate class handles the creation and releasing of resources when sending or synchronously receiving messages. (JEE: @Resource) \\
-
+    \textbf{Annotation}            & \textbf{Meaning}                                                                                                                                                                                                       \\
+    @SpringBootApplication         & Convenience annotation, bundles @Configuration, @EnableAutoConfiguration and @ComponentScan                                                                                                                            \\
+    @Component                     & The generalized form considered as a candidate for auto-detection when using annotation-based configuration and classpath scanning. It extended to more specific forms such as @Controller, @Repository, and @Service. \\
+    @Controller                    & To indicate C in MVC pattern (presentation layer, dialog control)                                                                                                                                                      \\
+    @RequestMapping                & URI pattern for of RESTful HTTP resources (JEE: JAX-RS)                                                                                                                                                                \\
+    @Service, @Repository          & Specializations of @Component in Spring for DDD (lesson 6)                                                                                                                                                             \\
+    @Transactional                 & System transaction (ACID), container is transaction manager                                                                                                                                                            \\
+    @EnableCaching                 & Responsible for registering the necessary Spring components that power annotation-driven cache management                                                                                                              \\
+    @Table, @Entity                & Spring Data JPA, steer O/R mapping                                                                                                                                                                                     \\
+    @Query                         & Spring Data JPA, associates query with method                                                                                                                                                                          \\
+    @Profile, @Primary, @Qualifier & Conditional bean registration (OS level, development stage, etc.)                                                                                                                                                      \\
+    @Autowired                     & Spring Framework; no need for DI getters/setters (JEE: @Inject)                                                                                                                                                        \\
+    @JMSListener                   & Defines the name of the Destination that this method should listen to. (JEE: @MessageDriven)                                                                                                                           \\
+    @JMSTemplate                   & JmsTemplate class handles the creation and releasing of resources when sending or synchronously receiving messages. (JEE: @Resource)                                                                                   \\
   \end{tblr}
   \caption{Spring Annotations}
 \end{table}
