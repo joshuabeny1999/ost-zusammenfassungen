@@ -1,5 +1,5 @@
 \section{Patterns of Enterprise Application Architecture (PoEAA)}
-Martin Fowler created a good overview of \href{https://www.martinfowler.com/eaaCatalog/index.html}{PoEAA}. The book is from 2003, logical layers and most base patterns are still valid until today. 
+Martin Fowler created a good overview of \href{https://www.martinfowler.com/eaaCatalog/index.html}{PoEAA}. The book is from 2003, logical layers and most base patterns are still valid until today.
 
 \subsection{Presentation Layer Pattern}
 The template view pattern is used in distributed presentation and the Template View Pattern is one example of a Presentation layer Pattern. The known uses are in: JavaScript (Handlebars), ASP.NET, JSPs.
@@ -40,31 +40,31 @@ Domain-driven design knows two types of design tools: Strategic design tools and
 Strategic Design helps the developer to solve all problems regarding software modelling. It has similarities to Object-oriented design. In strategic design the architect is also forced to think in terms of a context.
 
 \begin{description}
-	\item [Domain] a sphere of knowledge or activity and refers to the business. 
-	\item [Model] a system of abstractions representing selected aspects of a domain.
-	\item [Ubiquitous Language] Is a common language used by all team members to describe activities of the team around the domain model. It is used to to talk with domain experts and team members and describe classes, methods etc.
-	\item [Bounded Context] Refers to a boundary condition for a context. It descends a boundary and acts as a threshold within which, a particular domain model is defined and applicable. \textit{Heuristic:} Implement one (micro-)service per Bounded Context
+  \item [Domain] a sphere of knowledge or activity and refers to the business.
+  \item [Model] a system of abstractions representing selected aspects of a domain.
+  \item [Ubiquitous Language] Is a common language used by all team members to describe activities of the team around the domain model. It is used to to talk with domain experts and team members and describe classes, methods etc.
+  \item [Bounded Context] Refers to a boundary condition for a context. It descends a boundary and acts as a threshold within which, a particular domain model is defined and applicable. \textit{Heuristic:} Implement one (micro-)service per Bounded Context
 \end{description}
 
 \subsubsection{Bounded Context vs. Subdomain}
-Bounded Contexts implement parts of one or multiple subdomains. 
+Bounded Contexts implement parts of one or multiple subdomains.
 
 \begin{description}
-	\item [Subdomain] is in the problem space and the result of Object-oriented analysis (OOA)
-	\item [Bounded Context] is in the solution space and the result of Object-oriented design (OOD)
+  \item [Subdomain] is in the problem space and the result of Object-oriented analysis (OOA)
+  \item [Bounded Context] is in the solution space and the result of Object-oriented design (OOD)
 \end{description}
 
 \subsubsection{Bounded Context Map}
 The Context Map as in Figure \ref{fig:contextmap} defines how Bounded Contexts do integrate. Additionally the information flow between the context is modelled.  To create Such Context Maps the \href{https://contextmapper.org/}{Context Mapper} can be used.
 
 \begin{description}
-	\item [Shared Kernel] Two bounded contexts use a common kernel of code (for example a library) as a common lingua-franca, but otherwise do their other stuff in their own specific way. This is a symmetric relationship.
-	\item [Open Host Service (OHS)] A Bounded Context specifies a protocol by which any other bounded context can use its services (e.g. a RESTful HTTP service or a SOAP Web service). This protocol may expose a Published Language.
-	\item [Published Language (PL)] The interacting bounded contexts agree on a common a language (for example a bunch of XML or JSON schemas over an enterprise service bus) by which they can interact with each other. 
-	\item [Conformist (CF)] One BC uses the services of another but is not a stakeholder to that other BC. As such it uses "as-is" (conforms to) the protocols or APIs provided by that bounded context (which may be an OHS).
-	\item [Anti-Corruption Layer (ACL)] One bounded context uses the services of another and is not a stakeholder, but aims to minimize impact from changes in the bounded context it depends on by introducing a set of adapters – an anti-corruption layer.
-	\item [Customer/Supplier (CS)]  One bounded context uses the services of another and is a stakeholder (customer) of that other bounded context. As such it can influence the services provided by that bounded context. The supplier may expose a PL.
-\end{description} 
+  \item [Shared Kernel] Two bounded contexts use a common kernel of code (for example a library) as a common lingua-franca, but otherwise do their other stuff in their own specific way. This is a symmetric relationship.
+  \item [Open Host Service (OHS)] A Bounded Context specifies a protocol by which any other bounded context can use its services (e.g. a RESTful HTTP service or a SOAP Web service). This protocol may expose a Published Language. (\textit{Upstream Role})
+  \item [Published Language (PL)] The interacting bounded contexts agree on a common a language (for example a bunch of XML or JSON schemas over an enterprise service bus) by which they can interact with each other. (\textit{Upstream Role})
+  \item [Conformist (CF)] One BC uses the services of another but is not a stakeholder to that other BC. As such it uses "as-is" (conforms to) the protocols or APIs provided by that bounded context (which may be an OHS). (\textit{Downstream Role})
+  \item [Anti-Corruption Layer (ACL)] One bounded context uses the services of another and is not a stakeholder, but aims to minimize impact from changes in the bounded context it depends on by introducing a set of adapters – an anti-corruption layer. (\textit{Downstream Role})
+  \item [Customer/Supplier (CS)]  One bounded context uses the services of another and is a stakeholder (customer) of that other bounded context. As such it can influence the services provided by that bounded context. The supplier may expose a PL.
+\end{description}
 
 \begin{figure}[H]
   \center
@@ -80,12 +80,12 @@ In contrast to the strategic design, tactical design talks about implementation 
 
 Parts of the domain model created in the Tactical design phase:
 \begin{description}
-	\item [Entity] An Entity is a class which has some properties. Each instance of the class has a global identity and keeps the identity throughout the lifespan.
-	\item [Value Object] Are \textit{immutable} and light-weight objects without an identity. 
-	\item [Service] A service is a stateless class that fits somewhere else other than an entity or value object. A service is a functionality that exists somewhere between entities and values objects but it is neither related to an entity nor values objects.
-	\item [Aggregate] An Aggregate is a collection of entities and values which come under a single transaction boundary.
-	\item [Repository] A Repository helps in persisting aggregates.
-	\item [Factory] A Factory does create aggregates in order for them to be used in the application.
+  \item [Entity] An Entity is a class which has some properties. Each instance of the class has a global identity and keeps the identity throughout the lifespan.
+  \item [Value Object] Are \textit{immutable} and light-weight objects without an identity.
+  \item [Service] A service is a stateless class that fits somewhere else other than an entity or value object. A service is a functionality that exists somewhere between entities and values objects but it is neither related to an entity nor values objects.
+  \item [Aggregate] An Aggregate is a collection of entities and values which come under a single transaction boundary.
+  \item [Repository] A Repository helps in persisting aggregates.
+  \item [Factory] A Factory does create aggregates in order for them to be used in the application.
 \end{description}
 
 \begin{figure}[H]
