@@ -1,15 +1,24 @@
 \section{Enterprise Integration Patterns (EIP)}
-Integration patterns are a set of design patterns that can be used to solve common integration problems when connecting different systems and applications. These patterns provide a common language and best practices for designing and implementing integration solutions.
+Integration patterns are a set of design patterns that can be used to solve common integration problems when connecting different systems and applications. These patterns provide a common language and best practices for designing and implementing integration solutions. It is a "known use" of Pipes \& Filters Pattern (Patterns of Software Architecture, Volume 1).
+
+In essence, a message is transmitted in five steps:
+\begin{description}
+  \item[Create] the sender creates the message and populates it with data.
+  \item[Send] the sender adds the message to a channel.
+  \item[Deliver] the messaging system moves the message from the sender’s computer to the receiver’s computer, making it available to the receiver.
+  \item[Receive] the receiver reads the message from the channel.
+  \item[Process ] the receiver extracts the data from the message.
+\end{description}
 
 \subsection{Integration Styles}
 \subsubsection{File Transfer}
 \begin{minipage}{.4\textwidth}
   \begin{figure}[H]
-  \center
-  \caption{Shared Database}
-  \includegraphics[width=\textwidth]{filetransfer}
-  \caption{File Transfer}
-\end{figure}
+    \center
+    \caption{Shared Database}
+    \includegraphics[width=\textwidth]{filetransfer}
+    \caption{File Transfer}
+  \end{figure}
 \end{minipage}
 \begin{minipage}[b]{.6\textwidth}
   Have each application produce files containing information that other applications need to consume. Integrators take the responsibility of transforming files into different formats. Produce the files at regular intervals according to the nature of the business.
@@ -18,10 +27,10 @@ Integration patterns are a set of design patterns that can be used to solve comm
 \subsubsection{Shared Database}
 \begin{minipage}{.4\textwidth}
   \begin{figure}[H]
-  \center
-  \includegraphics[width=\textwidth]{shareddatabase}
-  \caption{Shared Database}
-\end{figure}
+    \center
+    \includegraphics[width=\textwidth]{shareddatabase}
+    \caption{Shared Database}
+  \end{figure}
 \end{minipage}
 \begin{minipage}[b]{.6\textwidth}
   Integrate applications by having them store their data in a single Shared Database.
@@ -29,56 +38,56 @@ Integration patterns are a set of design patterns that can be used to solve comm
 
 \subsubsection{Remote Procedure Call}
 \begin{minipage}{.4\textwidth}
-\begin{figure}[H]
-  \center
-  \includegraphics[width=0.75\textwidth]{rpc}
-  \caption{Remote Procedure Call}
-\end{figure}
+  \begin{figure}[H]
+    \center
+    \includegraphics[width=0.75\textwidth]{rpc}
+    \caption{Remote Procedure Call}
+  \end{figure}
 \end{minipage}
 \begin{minipage}[b]{.6\textwidth}
-Develop each application as a large-scale object or component with encapsulated data. Provide an interface to allow other applications to interact with the running application.
+  Develop each application as a large-scale object or component with encapsulated data. Provide an interface to allow other applications to interact with the running application.
 \end{minipage}
 
 \subsubsection{Messaging}
 \begin{minipage}{.4\textwidth}
-\begin{figure}[H]
-  \center
-  \includegraphics[width=\textwidth]{integrationstyle-messaging}
-  \caption{Messaging}
-\end{figure}
+  \begin{figure}[H]
+    \center
+    \includegraphics[width=\textwidth]{integrationstyle-messaging}
+    \caption{Messaging}
+  \end{figure}
 \end{minipage}
 \begin{minipage}[b]{.6\textwidth}
-Use Messaging to transfer packets of data frequently, immediately, reliably, and asynchronously, using customizable formats.
+  Use Messaging to transfer packets of data frequently, immediately, reliably, and asynchronously, using customizable formats.
 \end{minipage}
 
 \subsection{Asynchronous Messaging}
 Messaging capabilities are typically provided by a separate software system called a messaging system or message-oriented middleware (MOM), which is comparable to database systems that manage data persistence.
 
 \begin{itemize}
-	\item Database administrator populates database with schema for application data; MOM administrator configures the messaging system with channels that define the paths of communication between the applications. Messaging system manages sending and receiving of messages.
-	\item Database makes sure each data record is safely persisted, and likewise main task of messaging system is to move messages from the sender’s computer to the receiver’s computer in a reliable fashion.
+  \item Database administrator populates database with schema for application data; MOM administrator configures the messaging system with channels that define the paths of communication between the applications. Messaging system manages sending and receiving of messages.
+  \item Database makes sure each data record is safely persisted, and likewise main task of messaging system is to move messages from the sender’s computer to the receiver’s computer in a reliable fashion.
 \end{itemize}
 
 The reason a messaging system is needed to move messages from one computer to another is that computers and the networks that connect them are inherently unreliable. Just because one application is ready to send a communication does not mean that the other application is ready to receive it. Even if both applications are ready, the network may not be working, or may fail to transmit the data properly. A messaging system overcomes these limitations by repeatedly trying to transmit the message until it succeeds. Under ideal circumstances, the message is transmitted successfully on the first try, but circumstances are often not ideal.
 
 \paragraph{Loose coupling dimensions:}
 \begin{description}
-	\item [Reference Autonomy] Producers and Consumers don't know each other
-	\item [Platform Autonomy] Producers and consumers may be located in different technical environment (e.g. containers), can be written in different languages.
-	\item [Time Autonomy] Producers and Consumers access channel at their own pace: Communication is asynchronous, Data exchanged is persistent
-	\item [Format Autonomy] Producers and consumers may use different formats of exchanged Data
+  \item [Reference Autonomy] Producers and Consumers don't know each other
+  \item [Platform Autonomy] Producers and consumers may be located in different technical environment (e.g. containers), can be written in different languages.
+  \item [Time Autonomy] Producers and Consumers access channel at their own pace: Communication is asynchronous, Data exchanged is persistent
+  \item [Format Autonomy] Producers and consumers may use different formats of exchanged Data
 \end{description}
 
 \begin{figure}[H]
   \center
-  \includegraphics[width=0.8\textwidth]{messaging}
+  \includegraphics[width=0.9\textwidth]{messaging}
   \caption{EIP Pattern Categories}
 \end{figure}
 
 \pagebreak
 
 \subsection{Message Construction Patterns}
-Describes the intent, form and content of the messages that travel across the messaging system. 
+Describes the intent, form and content of the messages that travel across the messaging system.
 
 \subsubsection{Document Message Pattern}
 Use a Document Message to reliably transfer data structure between applications. Whereas a Command Message tells the receiver to invoke certain behavior, a Document Message just passes data and lets the receiver decide what, if anything, to do with the data. The data is a single unit of data, a single object or data structure which may decompose into smaller units.
@@ -161,10 +170,10 @@ Connect an application to a messaging channel using a Message Endpoint, a client
 
 \textbf{Key considerations:}
 \begin{itemize}
-	\item Number of consumer endpoints? Push vs. pull (be event-driven)?
-	\item Behavior of consumers: competing? browse message or remove it from queue?
-	\item Idempotency (i.e., resending identical request messages does not change state of receiving application)?
-	\item transactional semantics (ACID properties, local/distributed 2PC)?
+  \item Number of consumer endpoints? Push vs. pull (be event-driven)?
+  \item Behavior of consumers: competing? browse message or remove it from queue?
+  \item Idempotency (i.e., resending identical request messages does not change state of receiving application)?
+  \item transactional semantics (ACID properties, local/distributed 2PC)?
 \end{itemize}
 
 \begin{figure}[H]

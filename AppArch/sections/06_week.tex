@@ -68,9 +68,35 @@ The Context Map as in Figure \ref{fig:contextmap} defines how Bounded Contexts d
 
 \begin{figure}[H]
   \center
-  \includegraphics[width=0.65\textwidth]{contextmap}
+  \includegraphics[width=0.8\textwidth]{contextmap}
   \caption{Bounded Context Example}
   \label{fig:contextmap}
+\end{figure}
+
+\textbf{Context Map Decision Tree}
+Three plus one basic decisions when drawing a DDD context map: 
+\begin{itemize}
+  \item Topology (of deployment/of systems): local (co-located) vs. remote? 
+  \item If remote, is relation (a)symmetric? Unidirectional or bidirectional?
+  \item Visibility and amount of control over API (for client/customer)? 
+  \item If little or no control, should an Anti-Corruption Layer (ACL) be introduced? 
+\end{itemize}
+
+Side note/observation: Open Host Service (OHS) and Published Language (PL) described a bit ambiguously/narrow 
+\begin{itemize}
+  \item What do “open” and “published” mean here (i.e. in this context)? 
+  \item Do these patterns build on each other? Or do they compete? 
+\end{itemize}
+Customer/Supplier pattern and Conformist/OHS combinations require Enterprise Application Integration (asynch. messaging, ACL pattern) 
+\begin{itemize}
+  \item Enterprise Application Integration: model transformation and adaptation
+\end{itemize}
+
+\begin{figure}[H]
+  \center
+  \includegraphics[width=0.65\textwidth]{contextmap-decisiontree}
+  \caption{Context Map decision Tree}
+  \label{fig:contextmap-decisiontree}
 \end{figure}
 
 \pagebreak
