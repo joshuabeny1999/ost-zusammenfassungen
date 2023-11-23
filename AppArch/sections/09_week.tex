@@ -157,7 +157,7 @@ Use Guaranteed Delivery to make messages persistent so that they are not lost ev
 \end{figure}
 
 \subsubsection{Dead Letter Channel Pattern}
-When a messaging system determines that it cannot or should not deliver a message, it may elect to move the message to a Dead Letter Channel. The specific way a Dead Letter Channel works depends on the specific messaging system’s implementation, if it provides one at all. The channel may be called a “dead message queue” or “dead letter queue.”
+When a messaging system determines that it cannot or should not deliver a message, it may elect to move the message to a Dead Letter Channel. The specific way a Dead Letter Channel works depends on the specific messaging system’s implementation, if it provides one at all. The channel may be called a “dead message queue” or “dead letter queue.” Typically, each machine the messaging system is installed on has its own local Dead Letter Channel so that whatever machine a message dies on, it can be moved from one local queue to another without any networking uncertainties. This also records what machine the message died on. When the messaging system moves the message, it may also record the original channel the message was supposed to be delivered on.
 
 \begin{figure}[H]
   \center
@@ -219,7 +219,7 @@ he application should use an Event-Driven Consumer, one that is automatically ha
 \end{figure}
 
 \subsubsection{Transactional Client Pattern}
-Use a Transactional Client – make the client’s session with the messaging system transactional so that the client can specify transaction boundaries. Both a sender and a receiver can be transactional. With a sender, the message isn’t “really” added to the channel until the sender commits the transaction. With a receiver, the message isn’t “really” removed from the channel until the receiver commits the transaction.
+Use a Transactional Client – make the client’s session with the messaging system transactional so that the client can specify transaction boundaries. Both a sender and a receiver can be transactional. With a sender, the message isn’t “really” added to the channel until the sender commits the transaction. With a receiver, the message isn’t “really” removed from the channel until the receiver commits the transaction. A sender using explicit transactions can be used with a receiver using implicit transactions, and vise versa. A single channel might have a combination of implicitly and explicitly transactional senders (as well as receivers).
 
 \begin{figure}[H]
   \center
@@ -241,7 +241,7 @@ Insert a special filter, a Message Router, which consumes a Message from one Mes
 \end{figure}
 
 \subsubsection{Content-Based Router Pattern}
-Use a Content-Based Router to route each message to the correct recipient based on message content. The Content-Based Router examines the message content and routes the message onto a different channel based on data contained in the message. When implementing a Content-Based Router, special caution should be taken to make the routing function easy to maintain as the router can become a point of frequent maintenance.
+Use a Content-Based Router to route each message to the correct recipient based on message content. The Content-Based Router examines the message content and routes the message onto a different channel based on data contained in the message. When implementing a Content-Based Router, special caution should be taken to make the routing function easy to maintain as the router can become a point of frequent maintenance. In more sophisticated integration scenarios, the Content-Based Router can take on the form of a configurable rules engine that computes the destination channel based on a set of configurable rules.
 
 \begin{figure}[H]
   \center
@@ -250,7 +250,7 @@ Use a Content-Based Router to route each message to the correct recipient based 
 \end{figure}
 
 \subsubsection{Recipient List Pattern}
-Define a channel for each recipient. Then use a Recipient List to inspect an incoming message, determine the list of desired recipients, and forward the message to all channels associated with the recipients in the list. The logic embedded in a Recipient List can be pictured as two separate parts even though the implementation is often coupled together. The first part computes a list of recipients. The second part simply traverses the list and sends a copy of the received message to each recipient.
+Define a channel for each recipient. Then use a Recipient List to inspect an incoming message, determine the list of desired recipients, and forward the message to all channels associated with the recipients in the list. The logic embedded in a Recipient List can be pictured as two separate parts even though the implementation is often coupled together. The first part computes a list of recipients. The second part simply traverses the list and sends a copy of the received message to each recipient. Just like a Content-Based Router, the Recipient List usually does not modify the message contents.
 
 \begin{figure}[H]
   \center
@@ -259,7 +259,7 @@ Define a channel for each recipient. Then use a Recipient List to inspect an inc
 \end{figure}
 
 \subsubsection{Splittern Pattern}
-Use a Splitter to break out the composite message into a series of individual messages, each containing data related to one item. Use a Splitter that consumes one message containing a list of repeating elements, each of which can be processed individually.
+Use a Splitter to break out the composite message into a series of individual messages, each containing data related to one item. Use a Splitter that consumes one message containing a list of repeating elements, each of which can be processed individually. The Splitter publishes a one message for each single element (or a subset of elements) from the original message.
 
 \begin{figure}[H]
   \center
@@ -269,6 +269,10 @@ Use a Splitter to break out the composite message into a series of individual me
 
 \subsubsection{Aggregator Pattern}
 Use a stateful filter, an Aggregator, to collect and store individual messages until a complete set of related messages has been received. Then, the Aggregator publishes a single message distilled from the individual messages. The Aggregator is a special Filter that receives a stream of messages and identifies messages that are correlated. Once a complete set of messages has been received the Aggregator collects information from each correlated message and publishes a single, aggregated message to the output channel for further processing.
+\begin{description}
+  \item[Aggretation strategies] wait for all, timeout, first best, timeout with overrides, external event
+  \item[Aggregation algorithms] select "best" answer, condense data, collect data for later evaluation
+\end{description}
 
 \begin{figure}[H]
   \center
@@ -291,7 +295,7 @@ Use a special filter, a Message Translator, between other filters or application
 \end{figure}
 
 \subsubsection{Content Filter Pattern}
-Use a Content Filter to remove unimportant data items from a message leaving only important items. The Content Filter does not necessarily just remove data elements. A Content Filter is also useful to simplify the structure of the message. Often times, messages are represented as tree structures. Many messages originating from external systems or packaged applications contain many levels of nested, repeating groups because they are modeled after generic, normalized database structures.
+Use a Content Filter to remove unimportant data items from a message leaving only important items. The Content Filter does not necessarily just remove data elements. A Content Filter is also useful to simplify the structure of the message. Often times, messages are represented as tree structures. Many messages originating from external systems or packaged applications contain many levels of nested, repeating groups because they are modeled after generic, normalized database structures. Frequently, known constraints and assumptions make this level of nesting superfluous and a Content Filter can be used to 'flatten' the hierarchy into a simple list of elements than can be more easily understood and processed by other systems.
 
 \begin{figure}[H]
   \center
@@ -300,7 +304,7 @@ Use a Content Filter to remove unimportant data items from a message leaving onl
 \end{figure}
 
 \subsubsection{Content Enricher Pattern}
-Use a specialized transformer, a Content Enricher (a.k.a. Data Enricher), to access an external data source in order to augment a message with missing information. The Content Enricher uses information inside the incoming message (e.g. key fields) to retrieve data from an external source. After the Content Enricher has retrieved the required data from the resource, it appends the data to the message.
+Use a specialized transformer, a Content Enricher (a.k.a. Data Enricher), to access an external data source in order to augment a message with missing information. The Content Enricher uses information inside the incoming message (e.g. key fields) to retrieve data from an external source. After the Content Enricher has retrieved the required data from the resource, it appends the data to the message. The original information from the incoming message may be carried over into the resulting message or may no longer be needed, depending on the needs of the receiving application
 
 \begin{figure}[H]
   \center
