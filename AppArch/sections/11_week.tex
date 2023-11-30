@@ -1,15 +1,22 @@
 \section{Patterns of Enterprise Application Architecture for Integration (PEAA)}
 Patterns of Enterprise Application Architecture for Integration (PEAAI) are a set of design patterns for integrating enterprise applications, written by Martin Fowler. These patterns provide solutions to common integration problems faced in enterprise software development, such as connecting different systems, data migration, and communication between components.
 
+\subsection{Components vs. Services (Fowler's Definition)}
+\begin{quote}
+  I use \textbf{component} to mean a glob of software that's intended to be used, without change, by an application that is out of the control of the writers of the component. By 'without change' I mean that the using application doesn't change the source code of the components, although they may alter the component's behavior by extending it in ways allowed by the component writers.
+
+  \textbf{A service} is similar to a component in that it's used by foreign applications. The main difference is that I expect a component to be used locally (think jar file, assembly, DLL, or a source import). A service will be used remotely through some remote interface, either synchronous or asynchronous (e.g. Web service, messaging system, RPC, or socket.
+\end{quote}
+
 \subsection{Service Layer Pattern}
 Define an application's boundary with a layer of services that establishes a set of available operations and coordinates the application's response in each operation.
 
 Other responsibilities of Service Layer:
 \begin{itemize}
-	\item Role-Based Access Control (RBAC)
-	\item Transaction Control, business-level undo (compensation)
-	\item Activity logging (e.g. metering, monitoring)
-	\item Exception handling
+  \item Role-Based Access Control (RBAC)
+  \item Transaction Control, business-level undo (compensation)
+  \item Activity logging (e.g. metering, monitoring)
+  \item Exception handling
 \end{itemize}
 
 \begin{figure}[H]
@@ -21,6 +28,7 @@ Other responsibilities of Service Layer:
 \subsection{Remote Facade Pattern}
 Proves a coarse-grained facade on fine-grained objects to improve efficiency over a network.
 
+\textit{Remote Facade In an object-oriented model, you do best with small objects that have small methods. This gives you lots of opportunity for control and substitution of behavior, and to use good intention revealing naming to make an application easier to understand. One of the consequences of such fine-grained behavior is that there's usually a great deal of interaction between objects, and that interac tion usually requires lots of method invocations.}
 \begin{figure}[H]
   \center
   \includegraphics[width=0.5\textwidth]{remotefacade}
@@ -28,8 +36,11 @@ Proves a coarse-grained facade on fine-grained objects to improve efficiency ove
 \end{figure}
 
 \subsection{Data Transfer Object (DTO)}
-An object that carries data between processes in order to reduce the number of method calls. 
+An object that carries data between processes in order to reduce the number of method calls.
 
+\textit{When you’re working with a remote interface, such as Remote Facade (388), each call to it is expensive. As a result you need to reduce the number of calls, and that means that you need to transfer more data with each call. One way to do this is to use lots of parameters. However, this is often awkward to program - indeed, it’s often impossible with languages such as Java that return only a single value.}
+
+\textit{The solution is to create a Data Transfer Object that can hold all the data for the call. It needs to be serializable to go across the connection. Usually an assembler is used on the server side to transfer data between the DTO and any domain objects.}
 \begin{figure}[H]
   \center
   \includegraphics[width=0.75\textwidth]{datatransferobject}
@@ -40,10 +51,10 @@ An object that carries data between processes in order to reduce the number of m
 Mostly consists of separating your application into multiple services (most commonly HTTP services) which can be classified as different types like subsystem or tiers. There is not a single definition for SOA, since it means different things to people. A microservices architecture is a further evolution of SOA.
 
 \begin{itemize}
-	\item A set of services and operations that a business wants to expose to their customers and partners, or other portions of the organization.
-	\item An architectural style which requires a service provider, a service requestor (consumer) and a service contract (a.k.a. client/server).
-	\item  A set of architectural patterns such as service layer (with remote facades, data transfer objects), enterprise service bus, service composition (choreography/orchestration), and service registry, promoting principles such as modularity, layering, and loose coupling to achieve design goals such as reuse, and flexibility.
-	\item  A programming and deployment model realized by standards, tools and technologies such as Web services (WSDL/SOAP), RESTful HTTP, or asynchronous message queuing (AMQP etc.)
+  \item A set of services and operations that a business wants to expose to their customers and partners, or other portions of the organization.
+  \item An architectural style which requires a service provider, a service requestor (consumer) and a service contract (a.k.a. client/server).
+  \item  A set of architectural patterns such as service layer (with remote facades, data transfer objects), enterprise service bus, service composition (choreography/orchestration), and service registry, promoting principles such as modularity, layering, and loose coupling to achieve design goals such as reuse, and flexibility.
+  \item  A programming and deployment model realized by standards, tools and technologies such as Web services (WSDL/SOAP), RESTful HTTP, or asynchronous message queuing (AMQP etc.)
 \end{itemize}
 
 \begin{figure}[H]
@@ -53,7 +64,7 @@ Mostly consists of separating your application into multiple services (most comm
 \end{figure}
 
 \subsection{Microservices}
-Microservices architectures evolved from previous incarnations of Service-Oriented Architectures (SOAs) to promote agility and elasticity. Microservices are independently deployable, scalable and changeable services each having a single responsibility. These are often deployed in lightweight containers, encapsulate their own state, and communicate via message-based remote APIs (HTTP, queueing), ideally in a loosely coupled fashion.
+Microservices architectures evolved from previous incarnations of Service-Oriented Architectures (SOAs) to promote agility and elasticity. Microservices are independently deployable, scalable and changeable services each having a single responsibility modelling business capabilities. These are often deployed in lightweight containers, encapsulate their own state, and communicate via message-based remote APIs (HTTP, queueing), ideally in a loosely coupled fashion. They also facilitating polyglot programming and persistence. Leveraging DevOps practices including decentralized continuous delivery and end-to-end monitoring (for business agility and domain observability) is key to their success.
 
 \subsubsection{Benefits of Microservices}
 \begin{itemize}
@@ -68,19 +79,19 @@ Microservices architectures evolved from previous incarnations of Service-Orient
   \item Scaling the architecture to include a large number of microservices requires a disciplined approach to their life cycle management, monitoring, and debugging.
   \item Single points of failure and cascading failure proliferation effects need to be avoided, for example through redundancy or circuit breakers. This reduces the risk that failing downstream microservice instances bring down upstream ones (and, eventually, the entire system).
   \item Data consistency and state management challenges are introduced, for example when decoupling monolithic, stateful applications into independent, autonomous microservices (Furda et al. (2018)).
-Autonomy and consistency for the whole microservice architecture cannot be both guaranteed when employing a traditional backup and disaster recovery strategy
+        Autonomy and consistency for the whole microservice architecture cannot be both guaranteed when employing a traditional backup and disaster recovery strategy
 \end{itemize}
 
 \section{Representational State Transfer (REST)ful HTTP}
-REST is an architectural style (for integration), defined via constraints. There it is not an API technology or protocol. RESTful HTTP is one prominent incarnation of this style, when it is done right. 
+REST is an architectural style (for integration), defined via constraints. There it is not an API technology or protocol. RESTful HTTP is one prominent incarnation of this style, when it is done right.
 
 \begin{itemize}
-	\item Client-Server
-	\item Stateless
-	\item Cacheable
-	\item Uniform Interface (URI, HTTP)
-	\item Layered System
-	\item Code on Demand (Optional)
+  \item Client-Server
+  \item Stateless
+  \item Cacheable
+  \item Uniform Interface (URI, HTTP)
+  \item Layered System
+  \item Code on Demand (Optional)
 \end{itemize}
 
 \begin{figure}[H]
@@ -93,10 +104,10 @@ REST is an architectural style (for integration), defined via constraints. There
 Before we can grasp the definition of HATEOAS we need to have some parts defined. HATEOAS is a part of RESTful API architecture and design. HATEOAS make the APIs self-descriptive. Therefore the consumer does not need to know everything about the API.
 
 \begin{description}
-	\item [Hypermedia] are links to different parts of the API. These links are documentation and teaches the developer on how to use the API. 
+  \item [Hypermedia] are links to different parts of the API. These links are documentation and teaches the developer on how to use the API.
 \end{description}
 
-The following listing shows a JSON http answer with the hypermedia links which provide further actions. 
+The following listing shows a JSON http answer with the hypermedia links which provide further actions.
 
 \begin{lstlisting}
 HTTP/1.1 200 OK
