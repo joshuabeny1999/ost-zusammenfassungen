@@ -11,16 +11,53 @@ The OpenAPI specification (OAS), formerly known as the Swagger specification, is
 \end{figure}
 
 \subsection{Web Service Description Language (WSDL)}
-The Web Service Description Language (WSDL) is an XML-based language used to describe the functionality offered by a web service. It defines the operations (methods) that can be called on the service, the inputs and outputs for those operations, and the location of the service (the endpoint). 
+The Web Service Description Language (WSDL) is an XML-based language used to describe the functionality offered by a web service. It defines the operations (methods) that can be called on the service, the inputs and outputs for those operations, and the location of the service (the endpoint).
 
 \subsection{Microservice Domain-Sepcific Language (MSDL)}
 Microservice Domain-Specific Language (MDSL) is a language specifically designed to describe the structure and behavior of microservices. It is used to define the interface, dependencies, and other aspects of a microservice, and can be used to generate code, documentation, and other artifacts.
 
-\section{Microservice API Patterns (MAPI)}
-Microservice API Patterns (MAPI) refer to a set of best practices and design patterns for building and exposing APIs in a microservice architecture. MAPI helps ensure that APIs are consistent, scalable, secure, and easily consumable by clients.
+\section{Microservice API Patterns (MAP)}
+Microservice API Patterns (MAP) refer to a set of best practices and design patterns for building and exposing APIs in a microservice architecture. MAP helps ensure that APIs are consistent, scalable, secure, and easily consumable by clients.
 
 \begin{figure}[H]
   \center
   \includegraphics[width=\textwidth]{mapi}
   \caption{Mircoservice API Patterns}
+\end{figure}
+
+\section{Session State Management}
+\subsection{Client Session State (REST Level 3)}
+Scales well, but possibly has performance problems and must be secured.
+HTML/HTTP: cookie, hidden field, URL rewrite (Rest: no cookies!); JWT
+
+\begin{figure}[H]
+  \center
+  \includegraphics[width=0.5\textwidth]{sessionstatemanagementCSS}
+  \caption{Client Session State}
+\end{figure}
+
+\subsection{Server Session State}
+Uses main memory or proprietary data stores in an application server (e.g., Spring or ,HTTP session API in JEE servlet container).
+Persistent HTTP sessions no longer recommended when deploying to a cloud due to scalability and reliability concerns.
+
+\begin{figure}[H]
+  \center
+  \includegraphics[width=0.5\textwidth]{sessionstatemanagementSSS}
+  \caption{Server Session State}
+\end{figure}
+
+\subsection{Database Session State}
+Is well supported in many clouds, e.g. via highly scalable key value storage (a type of NoSQL database) such as Redis.
+
+\begin{figure}[H]
+  \center
+  \includegraphics[width=0.5\textwidth]{sessionstatemanagementDSS}
+  \caption{Database Session State}
+\end{figure}
+
+\subsection{Application State Management}
+\begin{figure}[H]
+  \center
+  \includegraphics[width=0.9\textwidth]{applicationstatemanagement}
+  \caption{Application State Management}
 \end{figure}
